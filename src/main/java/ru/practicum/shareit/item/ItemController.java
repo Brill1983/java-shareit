@@ -16,26 +16,27 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
+    public static final String HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto saveItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody @Valid ItemDto itemDto) {
+    public ItemDto saveItem(@RequestHeader(HEADER) long userId, @RequestBody @Valid ItemDto itemDto) {
         return itemService.createItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemDto updateItem(@RequestHeader(HEADER) long userId,
                               @RequestBody ItemDto itemDto,
                               @PathVariable long itemId) {
         return itemService.updateItem(userId, itemDto, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
-        return itemService.getItemById(itemId); // зачем тут нужен userId?????
+    public ItemDto getItemById(@RequestHeader(HEADER) long userId, @PathVariable long itemId) {
+        return itemService.getItemById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> getUserItems(@RequestHeader(HEADER) long userId) {
         return itemService.getUserItems(userId);
     }
 

@@ -30,7 +30,8 @@ public class UserService {
     }
 
     public UserDto updateUser(UserDto userDto, long userId) {
-        User userCheck = userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        User userCheck = userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
 
         if (userRepository.getUsersEmails().contains(userDto.getEmail()) && !userCheck.getEmail().equals(userDto.getEmail())) {
             throw new EmailExistException("Пользователь с такой почтой уже зарегистрирован");
@@ -43,12 +44,14 @@ public class UserService {
     }
 
     public UserDto getUserById(long userId) {
-        User user = userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        User user = userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         return UserMapper.toUserDto(user);
     }
 
     public void deleteUser(long userId) {
-        userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         userRepository.deleteUser(userId);
     }
 

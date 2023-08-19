@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class UserRepositoryImp implements UserRepository {
 
     private final Map<Long, User> userRepository = new HashMap<>();
-    long userCounter = 0L;
+    private Long userCounter = 0L;
 
     @Override
     public User createUser(User user) {
@@ -22,12 +22,8 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public User updateUser(User user) {
         User userFromRep = userRepository.get(user.getId());
-        if (user.getName() != null) {
-            userFromRep.setName(user.getName());
-        }
-        if (user.getEmail() != null) {
-            userFromRep.setEmail(user.getEmail());
-        }
+        Optional.ofNullable(user.getName()).ifPresent(userFromRep::setName);
+        Optional.ofNullable(user.getEmail()).ifPresent(userFromRep::setEmail);
         return userFromRep;
     }
 
@@ -38,11 +34,7 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Optional<User> getUserById(long id) {
-        if (userRepository.containsKey(id)) {
-            return Optional.of(userRepository.get(id));
-        } else {
-            return Optional.empty();
-        }
+        return userRepository.containsKey(id) ? Optional.of(userRepository.get(id)) : Optional.empty();
     }
 
     @Override

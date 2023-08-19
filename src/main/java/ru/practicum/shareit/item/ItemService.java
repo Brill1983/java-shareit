@@ -23,7 +23,8 @@ public class ItemService {
     private final UserRepository userRepository;
 
     public ItemDto createItem(long userId, ItemDto itemDto) {
-        userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userId);
         Item itemFromRepos = itemRepository.createItem(item);
@@ -31,8 +32,10 @@ public class ItemService {
     }
 
     public ItemDto updateItem(long userId, ItemDto itemDto, long itemId) {
-        userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-        Item itemFromPer = itemRepository.getItemById(itemId).orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
+        userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        Item itemFromPer = itemRepository.getItemById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
         if (itemFromPer.getOwner() != userId) {
             throw new ItemNotFoundException("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено");
         }
@@ -44,15 +47,16 @@ public class ItemService {
     }
 
     public ItemDto getItemById(long itemId) {
-        Item item = itemRepository.getItemById(itemId).orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
+        Item item = itemRepository.getItemById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
 
         return ItemMapper.toItemDto(item);
     }
 
     public List<ItemDto> getUserItems(long userId) {
-        userRepository.getUserById(userId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-        List<Item> itemsList = itemRepository.getUserItems(userId);
-        return itemsList.stream()
+        userRepository.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        return itemRepository.getUserItems(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
 
