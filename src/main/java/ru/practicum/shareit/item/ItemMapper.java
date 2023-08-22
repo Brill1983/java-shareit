@@ -14,13 +14,13 @@ public class ItemMapper {
         );
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(ItemDto itemDto, long userId) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName() != null ? itemDto.getName() : null,
                 itemDto.getDescription() != null ? itemDto.getDescription() : null,
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : null,
-                0L
+                userId
         );
     }
 }

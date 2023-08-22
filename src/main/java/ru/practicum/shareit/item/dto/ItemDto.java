@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,12 +19,12 @@ public class ItemDto {
 
     private long id;
 
-    @NotBlank(message = "Передан предмет без названия")
+    @NotBlank(groups = {Create.class}, message = "Передан предмет без названия")
     private String name;
 
-    @NotBlank(message = "Передан предмет без описания")
+    @NotBlank(groups = {Create.class}, message = "Передан предмет без описания")
     private String description;
 
-    @NotNull(message = "Передан предмет без указания доступности")
+    @NotNull(groups = {Create.class}, message = "Передан предмет без указания доступности")
     private Boolean available;
 }
