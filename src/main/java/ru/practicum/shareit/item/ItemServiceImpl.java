@@ -24,7 +24,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
-        userRepository.getUserById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         Item item = ItemMapper.toItem(itemDto, userId);
         Item itemFromRepos = itemRepository.createItem(item);
@@ -33,7 +33,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(long userId, ItemDto itemDto, long itemId) {
-        userRepository.getUserById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         Item itemFromPer = itemRepository.getItemById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getUserItems(long userId) {
-        userRepository.getUserById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         return itemRepository.getUserItems(userId).stream()
                 .map(ItemMapper::toItemDto)
