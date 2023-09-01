@@ -20,10 +20,21 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private long id;
+    private Long id;
 
     private String name;
 
     private String email;
+
+    @Override //TODO проверить необходимость
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override //TODO проверить необходимость
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

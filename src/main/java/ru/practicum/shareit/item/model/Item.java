@@ -1,19 +1,25 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import ru.practicum.shareit.user.model.User;
+
+import javax.persistence.*;
 
 
 /**
  * TODO Sprint add-controllers.
  */
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "items")
+@Getter @Setter @ToString
 public class Item {
 
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
@@ -21,5 +27,19 @@ public class Item {
 
     private Boolean available;
 
-    private long owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
+    @Override //TODO проверить необходимость
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item)) return false;
+        return id != null && id.equals(((Item) o).getId());
+    }
+
+    @Override //TODO проверить необходимость
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
 }

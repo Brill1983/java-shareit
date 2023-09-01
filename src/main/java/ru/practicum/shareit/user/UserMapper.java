@@ -23,4 +23,15 @@ public class UserMapper {
                 userDto.getEmail() != null ? userDto.getEmail() : null
         );
     }
+
+    public static User toUser(UserDto userDto, User user) {
+
+
+        User user1 = new User(
+                userDto.getId(),
+                userDto.getName() != null ? userDto.getName() : user.getName(),
+                userDto.getEmail() != null ? userDto.getEmail() : user.getEmail()
+        );
+        return user1;
+    }
 }

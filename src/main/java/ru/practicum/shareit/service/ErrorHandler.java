@@ -1,12 +1,12 @@
 package ru.practicum.shareit.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exceptions.EmailExistException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 
@@ -19,9 +19,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleEmailExistExc(EmailExistException e) {
+    public ErrorResponse handleEmailExistExc(DataIntegrityViolationException e) {
         log.info("Validation: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Пользователь с такой почтой уже зарегистрирован");
     }
 
     @ExceptionHandler
