@@ -14,32 +14,22 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "items")
-@Getter @Setter @ToString
+@Data
 public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false, length = 200)
     private String description;
 
+    @Column(nullable = false)
     private Boolean available;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-    @Override //TODO проверить необходимость
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Item)) return false;
-        return id != null && id.equals(((Item) o).getId());
-    }
-
-    @Override //TODO проверить необходимость
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
 }

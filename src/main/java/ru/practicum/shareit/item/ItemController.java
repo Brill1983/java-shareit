@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.service.Create;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class ItemController {
     public static final String HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto saveItem(@RequestHeader(HEADER) long userId, @RequestBody /*@Valid*/ @Validated({Create.class}) ItemDto itemDto) {
+    public ItemDto saveItem(@RequestHeader(HEADER) long userId, @RequestBody @Validated({Create.class}) ItemDto itemDto) {
         return itemService.createItem(userId, itemDto);
     }
 
