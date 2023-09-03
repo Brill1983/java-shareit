@@ -5,20 +5,5 @@ import ru.practicum.shareit.user.model.User;
 
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    // save
-    // delete
 
-//    User updateUserBy(User user);
-
-//    User createUser(User user);
-//
-//    User updateUser(User user);
-//
-//    void deleteUser(long userId);
-//
-//    Optional<User> getUserById(long id);
-//
-//    List<String> getUsersEmails();
-//
-//    List<User> getAllUsers();
 }
