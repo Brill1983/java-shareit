@@ -8,9 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
