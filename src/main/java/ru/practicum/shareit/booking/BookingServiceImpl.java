@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService{
             throw new BadParameterException("В запросе аренды дата/время возврата должна быть строго позже начала аренды");
         }
         if(user.getId().equals(item.getUser().getId())) {
-            throw new BadParameterException("Где-то ошибка: запрос аренды отправле от владельца вещи");
+            throw new ItemNotFoundException("Где-то ошибка: запрос аренды отправлен от владельца вещи");
         }
         Booking booking = BookingMapper.toBooking(bookingDto, user, item);
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
@@ -78,7 +78,7 @@ public class BookingServiceImpl implements BookingService{
                 .orElseThrow(() -> new BookingNotFoundException("Запроса на аренду с ID " + bookingId + " не зарегистрировано"));
         if(booking.getBooker().getId() != userId) {
             if (booking.getItem().getUser().getId() != userId) {
-                throw new BadParameterException("Пользователь " + userId + " не создавал бронь с ID " + bookingId +
+                throw new BookingNotFoundException("Пользователь " + userId + " не создавал бронь с ID " + bookingId +
                         " и не является владельцем вещи " + booking.getItem().getId());
             }
         }
@@ -88,10 +88,9 @@ public class BookingServiceImpl implements BookingService{
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> findUserBookings(long userId, String state) {
-        String check = state.toLowerCase();
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-        switch (check) {
+        switch (state.toLowerCase()) {
             case ("all"):
                 return bookingRepository.findByBooker_IdOrderByStartDesc(userId).stream()
                         .map(BookingMapper::toBookingDto)
@@ -121,9 +120,41 @@ public class BookingServiceImpl implements BookingService{
         }
     }
 
-    @Override //TODO Дописать
+    @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> findOwnerBookings(long userId, String state) {
-        return null;
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        if(itemRepository.findAllByUserIdOrderById(userId).isEmpty()) {
+            throw new ItemNotFoundException("Пользователь " + userId + " не является хозяином ни одной вещи");
+        }
+        switch (state.toLowerCase()) {
+            case ("all"):
+                return bookingRepository.findByOwnerIdOrderByStartDesc(userId).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            case ("current"):
+                return bookingRepository.findAllCurrentByOwnerId(userId, LocalDateTime.now()).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            case ("past"):
+                return bookingRepository.findAllPastByOwnerId(userId, LocalDateTime.now()).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            case ("future"):
+                return bookingRepository.findAllFutureByOwnerId(userId, LocalDateTime.now()).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            case ("waiting"):
+                return bookingRepository.findAllWaitingByOwnerId(userId).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            case ("rejected"):
+                return bookingRepository.findAllRejectedByOwnerId(userId).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            default:
+                throw new BadParameterException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 }

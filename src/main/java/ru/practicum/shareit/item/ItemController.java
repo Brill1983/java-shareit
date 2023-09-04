@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.service.Create;
 
 import java.util.List;
@@ -29,12 +30,12 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@RequestHeader(HEADER) long userId, @PathVariable long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemDtoDated getItemById(@RequestHeader(HEADER) long userId, @PathVariable long itemId) {
+        return itemService.getItemById(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader(HEADER) long userId) {
+    public List<ItemDtoDated> getUserItems(@RequestHeader(HEADER) long userId) {
         return itemService.getUserItems(userId);
     }
 

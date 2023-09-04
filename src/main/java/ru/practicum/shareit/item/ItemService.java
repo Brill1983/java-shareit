@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoDated;
 
 import java.util.List;
 
@@ -15,11 +16,12 @@ public interface ItemService {
     ItemDto updateItem(long userId, ItemDto itemDto, long itemId);
 
     @Transactional(readOnly = true)
-    ItemDto getItemById(long itemId);
+    ItemDtoDated getItemById(long userId, long itemId);
 
     @Transactional(readOnly = true)
-    List<ItemDto> getUserItems(long userId);
+    List<ItemDtoDated> getUserItems(long userId);
 
     @Transactional(readOnly = true)
     List<ItemDto> search(String text);
+
 }

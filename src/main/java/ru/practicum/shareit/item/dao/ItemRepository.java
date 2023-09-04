@@ -8,9 +8,12 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    List<Item> findAllByUserId (Long userId);
+    List<Item> findAllByUserIdOrderById (Long userId);
 
-    @Query("select it from Item as it where it.available = true and (upper(it.name) like upper(concat('%', ?1, '%')) or upper(it.description) like upper(concat('%', ?1, '%'))) ")
+    @Query("select it " +
+            "from Item as it " +
+            "where it.available = true and (upper(it.name) " +
+            "like upper(concat('%', ?1, '%')) or upper(it.description) like upper(concat('%', ?1, '%'))) ")
     List<Item> findByNameOrDescription(String text);
 
 }
