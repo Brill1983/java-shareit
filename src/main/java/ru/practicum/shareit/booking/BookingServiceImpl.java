@@ -10,9 +10,9 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.BookingNotFoundException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.service.ValidationService;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -29,12 +29,12 @@ public class BookingServiceImpl implements BookingService{
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final ValidationService validationService;
 
     @Override
     @Transactional
     public BookingDtoOut saveBooking(long userId, BookingDtoIn bookingDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        User user = validationService.checkUser(userId);
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + bookingDto.getItemId() + " не зарегистрировано"));
         if(!item.getAvailable()) {
@@ -88,8 +88,7 @@ public class BookingServiceImpl implements BookingService{
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> findUserBookings(long userId, String state) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        validationService.checkUser(userId);
         switch (state.toLowerCase()) {
             case ("all"):
                 return bookingRepository.findByBooker_IdOrderByStartDesc(userId).stream()
@@ -108,7 +107,7 @@ public class BookingServiceImpl implements BookingService{
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case ("waiting"):
-                return bookingRepository.findAllWaitingByBookerId(userId).stream()
+                return  bookingRepository.findAllWaitingByBookerId(userId).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case ("rejected"):
@@ -123,8 +122,7 @@ public class BookingServiceImpl implements BookingService{
     @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> findOwnerBookings(long userId, String state) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+        validationService.checkUser(userId);
         if(itemRepository.findAllByUserIdOrderById(userId).isEmpty()) {
             throw new ItemNotFoundException("Пользователь " + userId + " не является хозяином ни одной вещи");
         }
