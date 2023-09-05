@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,4 +24,6 @@ public class ItemDtoDated {
     private BookingDtoForItem lastBooking;
 
     private BookingDtoForItem nextBooking;
+
+    private List<CommentDto> comments = new ArrayList<>();
 }

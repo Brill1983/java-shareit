@@ -13,7 +13,7 @@ import ru.practicum.shareit.user.model.User;
 public class BookingMapper {
 
     public static BookingDtoOut toBookingDto(Booking booking) {
-        if(booking == null) {
+        if (booking == null) {
             return null;
         }
         return new BookingDtoOut(
@@ -27,7 +27,7 @@ public class BookingMapper {
     }
 
     public static BookingDtoForItem toItemBookingDto(Booking booking) {
-        if(booking == null) {
+        if (booking == null) {
             return null;
         }
         return new BookingDtoForItem(

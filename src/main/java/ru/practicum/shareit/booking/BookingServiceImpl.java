@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -21,10 +20,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
@@ -37,13 +35,13 @@ public class BookingServiceImpl implements BookingService{
         User user = validationService.checkUser(userId);
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + bookingDto.getItemId() + " не зарегистрировано"));
-        if(!item.getAvailable()) {
+        if (!item.getAvailable()) {
             throw new BadParameterException("У выбранной для аренды вещи статус: недоступна");
         }
-        if(bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
             throw new BadParameterException("В запросе аренды дата/время возврата должна быть строго позже начала аренды");
         }
-        if(user.getId().equals(item.getUser().getId())) {
+        if (user.getId().equals(item.getUser().getId())) {
             throw new ItemNotFoundException("Где-то ошибка: запрос аренды отправлен от владельца вещи");
         }
         Booking booking = BookingMapper.toBooking(bookingDto, user, item);
@@ -55,10 +53,10 @@ public class BookingServiceImpl implements BookingService{
     public BookingDtoOut bookingApprove(long userId, long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Запроса на аренду с ID " + bookingId + " не зарегистрировано"));
-        if(booking.getItem().getUser().getId() != userId) {
+        if (booking.getItem().getUser().getId() != userId) {
             throw new BookingNotFoundException("У пользователя с ID " + userId + " нет запроса на аренду с ID " + bookingId);
         }
-        if(booking.getStatus() == Status.WAITING) {
+        if (booking.getStatus() == Status.WAITING) {
             if (approved) {
                 booking.setStatus(Status.APPROVED);
             } else {
@@ -76,7 +74,7 @@ public class BookingServiceImpl implements BookingService{
     public BookingDtoOut findBookingById(long userId, long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Запроса на аренду с ID " + bookingId + " не зарегистрировано"));
-        if(booking.getBooker().getId() != userId) {
+        if (booking.getBooker().getId() != userId) {
             if (booking.getItem().getUser().getId() != userId) {
                 throw new BookingNotFoundException("Пользователь " + userId + " не создавал бронь с ID " + bookingId +
                         " и не является владельцем вещи " + booking.getItem().getId());
@@ -107,7 +105,7 @@ public class BookingServiceImpl implements BookingService{
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case ("waiting"):
-                return  bookingRepository.findAllWaitingByBookerId(userId).stream()
+                return bookingRepository.findAllWaitingByBookerId(userId).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case ("rejected"):
@@ -123,7 +121,7 @@ public class BookingServiceImpl implements BookingService{
     @Transactional(readOnly = true)
     public List<BookingDtoOut> findOwnerBookings(long userId, String state) {
         validationService.checkUser(userId);
-        if(itemRepository.findAllByUserIdOrderById(userId).isEmpty()) {
+        if (itemRepository.findAllByUserIdOrderById(userId).isEmpty()) {
             throw new ItemNotFoundException("Пользователь " + userId + " не является хозяином ни одной вещи");
         }
         switch (state.toLowerCase()) {
