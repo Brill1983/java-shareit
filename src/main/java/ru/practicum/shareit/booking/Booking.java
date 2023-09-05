@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings")
-@Data
+@Getter
+@Setter
 public class Booking {
 
     @Id

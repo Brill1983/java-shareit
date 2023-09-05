@@ -58,7 +58,6 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> search(String text) {
         if (text.isEmpty()) {
@@ -70,7 +69,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ItemDtoDated getItemById(long userId, long itemId) {
         validationService.checkUser(userId);
@@ -90,7 +88,6 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDtoDated> getUserItems(long userId) {
         validationService.checkUser(userId);
