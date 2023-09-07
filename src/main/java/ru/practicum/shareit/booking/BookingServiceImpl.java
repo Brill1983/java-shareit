@@ -109,7 +109,7 @@ public class BookingServiceImpl implements BookingService {
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                throw new BadParameterException("Unknown state: UNSUPPORTED_STATUS");
+                return null;
         }
     }
 
@@ -145,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                throw new BadParameterException("Unknown state: UNSUPPORTED_STATUS");
+                return null;
         }
     }
 }

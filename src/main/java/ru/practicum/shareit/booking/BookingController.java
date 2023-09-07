@@ -48,7 +48,7 @@ public class BookingController {
                                                 @RequestParam(defaultValue = "all") String state) {
         log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}", userId, state);
         BookingState enumState = BookingState.from(state)
-                .orElseThrow(() -> new BadParameterException("Unknown state: UNSUPPORTED_STATUS"));
+                .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
         return bookingService.findUserBookings(userId, enumState);
     }
 
@@ -57,7 +57,7 @@ public class BookingController {
                                                  @RequestParam(defaultValue = "all") String state) {
         log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}", userId, state);
         BookingState enumState = BookingState.from(state)
-                .orElseThrow(() -> new BadParameterException("Unknown state: UNSUPPORTED_STATUS"));
+                .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
         return bookingService.findOwnerBookings(userId, enumState);
     }
 }
