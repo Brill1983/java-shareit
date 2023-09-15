@@ -22,4 +22,6 @@ public class ItemDto {
 
     @NotNull(groups = {Create.class}, message = "Передан предмет без указания доступности")
     private Boolean available;
+
+    private Long requestId;
 }

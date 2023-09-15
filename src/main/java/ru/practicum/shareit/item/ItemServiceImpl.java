@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -16,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.service.ValidationService;
 import ru.practicum.shareit.user.model.User;
 
@@ -33,12 +36,18 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final ValidationService validationService;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Transactional
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
         User user = validationService.checkUser(userId);
-        Item itemFromDto = ItemMapper.toItem(itemDto, user);
+        Request request = null;
+        if(itemDto.getRequestId() != null) {
+            request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new RequestNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
+        }
+        Item itemFromDto = ItemMapper.toItem(itemDto, user, request);
         Item item = itemRepository.save(itemFromDto);
         return ItemMapper.toItemDto(item);
     }
@@ -52,7 +61,12 @@ public class ItemServiceImpl implements ItemService {
         if (itemFromRep.getUser().getId() != userId) {
             throw new ItemNotFoundException("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено");
         }
-        Item item = ItemMapper.toItem(itemDto, itemFromRep);
+        Request request = null;
+        if(itemDto.getRequestId() != null) {
+            request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new RequestNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
+        }
+        Item item = ItemMapper.toItem(itemDto, itemFromRep, request);
         item.setId(itemId);
 
         return ItemMapper.toItemDto(itemRepository.save(item));

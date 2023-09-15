@@ -16,4 +16,11 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "like upper(concat('%', ?1, '%')) or upper(it.description) like upper(concat('%', ?1, '%'))) ")
     List<Item> findByNameOrDescription(String text);
 
+//    List<Item> findAllByItemRequest_IdOrderById(Long requestId);
+
+    @Query("select it from Item as it where it.request.id in ?1 order by it.id")
+    List<Item> findItemsByRequest_IdInOrderById(List<Long> itemRequestIds);
+
+    @Query("select it from Item as it where it.request.user.id <> ?1 order by it.id")
+    List<Item> findItemsByRequestsUserIdNot(Long userId);
 }
