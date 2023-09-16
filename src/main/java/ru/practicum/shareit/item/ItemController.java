@@ -10,6 +10,9 @@ import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.service.Create;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 import static ru.practicum.shareit.booking.Constants.HEADER;
@@ -45,15 +48,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoDated> getUserItems(@RequestHeader(HEADER) long userId) {
-        log.info("В метод getUserItems передан userId {}", userId);
-        return itemService.getUserItems(userId);
+    public List<ItemDtoDated> getUserItems(@RequestHeader(HEADER) long userId,
+                                           @RequestParam(defaultValue = "0") @Min(0) int from,
+                                           @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+        log.info("В метод getUserItems передан userId {}, индекс первого элемента {}, количество элементов на странице {}", userId, from, size);
+        return itemService.getUserItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        log.info("В метод search передан text: '{}'", text);
-        return itemService.search(text);
+    public List<ItemDto> search(@RequestParam String text,
+                                @RequestParam(defaultValue = "0") @Min(0) int from,
+                                @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+        log.info("В метод search передан text: '{}', индекс первого элемента {}, количество элементов на странице {}", text, from, size);
+        return itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

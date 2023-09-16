@@ -1,12 +1,14 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dao.BookingRepository;
-import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.exceptions.RequestNotFoundException;
@@ -17,7 +19,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.RequestRepository;
+import ru.practicum.shareit.request.dao.RequestRepository;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.service.ValidationService;
 import ru.practicum.shareit.user.model.User;
@@ -43,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(long userId, ItemDto itemDto) {
         User user = validationService.checkUser(userId);
         Request request = null;
-        if(itemDto.getRequestId() != null) {
+        if (itemDto.getRequestId() != null) {
             request = requestRepository.findById(itemDto.getRequestId())
                     .orElseThrow(() -> new RequestNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
         }
@@ -62,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotFoundException("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено");
         }
         Request request = null;
-        if(itemDto.getRequestId() != null) {
+        if (itemDto.getRequestId() != null) {
             request = requestRepository.findById(itemDto.getRequestId())
                     .orElseThrow(() -> new RequestNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
         }
@@ -73,11 +75,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, int from, int size) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        List<Item> itemsList = itemRepository.findByNameOrDescription(text);
+        Pageable page = PageRequest.of(from / size, size);
+        List<Item> itemsList = itemRepository.findByNameOrDescription(text, page);
         return itemsList.stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -94,25 +97,27 @@ public class ItemServiceImpl implements ItemService {
         if (item.getUser().getId() != userId) {
             return ItemMapper.toItemDto(item, null, null, comments);
         }
-        List<Booking> lastBookings = bookingRepository.findLastBookingByItemId(itemId, LocalDateTime.now());
-        BookingDtoForItem lastBooking = BookingMapper.toItemBookingDto(lastBookings.isEmpty() ? null : lastBookings.get(0));
-        List<Booking> nextBookings = bookingRepository.findNextBookingByItemId(itemId, LocalDateTime.now());
-        BookingDtoForItem nextBooking = BookingMapper.toItemBookingDto(nextBookings.isEmpty() ? null : nextBookings.get(0));
-
-        return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
+        Booking lastBookings = bookingRepository.findFirstByItem_IdAndStartBeforeAndStatusOrderByStartDesc(itemId, LocalDateTime.now(), Status.APPROVED)
+                .orElse(null);
+        Booking nextBookings = bookingRepository.findFirstByItem_IdAndStartAfterAndStatusOrderByStart(itemId, LocalDateTime.now(), Status.APPROVED)
+                .orElse(null);
+        return ItemMapper.toItemDto(item, BookingMapper.toItemBookingDto(lastBookings), BookingMapper.toItemBookingDto(nextBookings), comments);
     }
 
     @Override
-    public List<ItemDtoDated> getUserItems(long userId) {
+    public List<ItemDtoDated> getUserItems(long userId, int from, int size) {
         validationService.checkUser(userId);
-        List<Item> items = itemRepository.findAllByUserIdOrderById(userId);
-        if (items.isEmpty()) {
-            throw new ItemNotFoundException("Пользователь " + userId + " не является хозяином ни одной вещи");
-        }
+
+        Pageable page = PageRequest.of(from / size, size);
+
+        List<Item> items = itemRepository.findAllByUserIdOrderById(userId, page);
+        List<Long> itemsIds = items.stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
 
         List<ItemDtoDated> datedItemList = new ArrayList<>();
-        List<Booking> lastBookings = bookingRepository.findLastBookingsByUserId(userId, LocalDateTime.now());
-        List<Booking> nextBookings = bookingRepository.findNextBookingsByUserId(userId, LocalDateTime.now());
+        List<Booking> lastBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartBeforeOrderByStartDesc(userId, itemsIds, LocalDateTime.now());
+        List<Booking> nextBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartAfterOrderByStart(userId, itemsIds, LocalDateTime.now());
         List<Comment> comments = commentRepository.findCommentsForItemsByOwnerId(userId);
 
         for (Item item : items) {
@@ -147,7 +152,8 @@ public class ItemServiceImpl implements ItemService {
         User user = validationService.checkUser(userId);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
-        List<Booking> bookings = bookingRepository.findAllByBookerIdAndItemId(userId, itemId, LocalDateTime.now());
+        List<Booking> bookings = bookingRepository.findAllByItem_IdAndBooker_IdAndStatusAndStartBeforeAndEndBefore(
+                itemId, userId, Status.APPROVED, LocalDateTime.now(), LocalDateTime.now());
         if (bookings.isEmpty()) {
             throw new BadParameterException("Пользователь " + userId + " не арендовал вещь " + itemId + ". Не имеет права писать отзыв");
         }

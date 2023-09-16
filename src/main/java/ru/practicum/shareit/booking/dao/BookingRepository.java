@@ -1,134 +1,49 @@
 package ru.practicum.shareit.booking.dao;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBooker_IdOrderByStartDesc(Long bookerId);
+    // ПОИСК ПО БУКЕРУ
+    List<Booking> findBookingsByBooker_IdOrderByStartDesc(Long bookerId, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.booker as bo  " +
-            "where bo.id = ?1 and b.start < ?2 and b.end > ?2 " +
-            "order by b.start ")
-    List<Booking> findAllCurrentByBookerId(Long bookerId, LocalDateTime dateTime);
+    List<Booking> findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStart(Long bookerId, LocalDateTime start, LocalDateTime end, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.booker as bo  " +
-            "where bo.id = ?1 and b.end < ?2 and b.status = 'APPROVED' " +
-            "order by b.start desc ")
-    List<Booking> findAllPastByBookerId(long userId, LocalDateTime dateTime);
-
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.booker as bo " +
-            "where bo.id = ?1 and b.start > ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllFutureByBookerId(long userId, LocalDateTime dateTime);
-
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.booker as bo " +
-            "where bo.id = ?1 and b.status = 'WAITING' " +
-            "order by b.start desc ")
-    List<Booking> findAllWaitingByBookerId(long userId);
-
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.booker as bo " +
-            "where bo.id = ?1 and b.status = 'REJECTED' " +
-            "order by b.start desc ")
-    List<Booking> findAllRejectedByBookerId(long userId);
+    List<Booking> findAllByBooker_IdAndEndBeforeAndStatusOrderByStartDesc(Long userId, LocalDateTime dateTime, Status status, Pageable page);
 
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 " +
-            "order by b.start desc")
-    List<Booking> findByOwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(long userId, LocalDateTime dateTime, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 and b.start < ?2 and b.end > ?2 " +
-            "order by b.start")
-    List<Booking> findAllCurrentByOwnerId(Long ownerId, LocalDateTime dateTime);
+    List<Booking> findAllByBooker_IdAndStatusOrderByStartDesc(long userId, Status status, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 and b.end < ?2 and b.status = 'APPROVED' " +
-            "order by b.start desc ")
-    List<Booking> findAllPastByOwnerId(Long ownerId, LocalDateTime dateTime);
+    //ПОИСК ПО ХОЗЯИНУ ВЕЩИ
+    List<Booking> findAllByItem_User_IdOrderByStartDesc(Long ownerId, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 and b.start > ?2 " +
-            "order by b.start desc ")
-    List<Booking> findAllFutureByOwnerId(Long ownerId, LocalDateTime dateTime);
+    List<Booking> findAllByItem_User_IdAndStartBeforeAndEndAfterOrderByStart(Long ownerId, LocalDateTime start, LocalDateTime end, Pageable page);
 
+    List<Booking> findAllByItem_User_IdAndEndBeforeAndStatusOrderByStartDesc(Long ownerId, LocalDateTime end, Status status, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 and b.status = 'WAITING' " +
-            "order by b.start desc ")
-    List<Booking> findAllWaitingByOwnerId(Long ownerId);
+    List<Booking> findAllByItem_User_IdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime start, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join i.user as u " +
-            "where u.id = ?1 and b.status = 'REJECTED' " +
-            "order by b.start desc ")
-    List<Booking> findAllRejectedByOwnerId(Long ownerId);
+    List<Booking> findAllByItem_User_IdAndStatusOrderByStartDesc(Long ownerId, Status status, Pageable page);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "where i.id = ?1 and b.start < ?2 and b.status = 'APPROVED'" +
-            "order by b.start desc")
-    List<Booking> findLastBookingByItemId(Long itemId, LocalDateTime dateTime);
+    // Поиск last и next booking для item
+    Optional<Booking> findFirstByItem_IdAndStartBeforeAndStatusOrderByStartDesc(Long itemId, LocalDateTime start, Status status);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "where i.id = ?1 and b.start > ?2 and b.status = 'APPROVED'" +
-            "order by b.start")
-    List<Booking> findNextBookingByItemId(Long itemId, LocalDateTime dateTime);
+    Optional<Booking> findFirstByItem_IdAndStartAfterAndStatusOrderByStart(Long itemId, LocalDateTime start, Status status);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i join i.user as u " +
-            "where u.id = ?1 and b.start < ?2 " +
-            "order by b.start desc")
-    List<Booking> findLastBookingsByUserId(Long userId, LocalDateTime dateTime);
+    List<Booking> findAllByItem_User_IdAndItem_IdInAndStartBeforeOrderByStartDesc(Long userId, List<Long> itemIds, LocalDateTime start);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i join i.user as u " +
-            "where u.id = ?1 and b.start > ?2 " +
-            "order by b.start")
-    List<Booking> findNextBookingsByUserId(Long userId, LocalDateTime dateTime);
+    List<Booking> findAllByItem_User_IdAndItem_IdInAndStartAfterOrderByStart(Long itemId, List<Long> itemIds, LocalDateTime start);
 
-    @Query("select b " +
-            "from Booking as b " +
-            "join b.item as i " +
-            "join b.booker as bo " +
-            "where bo.id = ?1 and i.id = ?2 and b.status = 'APPROVED' and b.start < ?3 and b.end < ?3")
-    List<Booking> findAllByBookerIdAndItemId(Long userId, Long itemId, LocalDateTime dateTime);
+    List<Booking> findAllByItem_IdAndBooker_IdAndStatusAndStartBeforeAndEndBefore(Long itemId, Long bookerId, Status status, LocalDateTime start, LocalDateTime end);
+
 
 }

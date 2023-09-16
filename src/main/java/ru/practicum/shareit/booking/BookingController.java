@@ -2,12 +2,16 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.exceptions.BadParameterException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 import static ru.practicum.shareit.booking.Constants.HEADER;
@@ -16,6 +20,7 @@ import static ru.practicum.shareit.booking.Constants.HEADER;
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -45,19 +50,25 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoOut> findUserBookings(@RequestHeader(HEADER) long userId,
-                                                @RequestParam(defaultValue = "all") String state) {
-        log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}", userId, state);
+                                                @RequestParam(defaultValue = "all") String state,
+                                                @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+        log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
+                "количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)
                 .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
-        return bookingService.findUserBookings(userId, enumState);
+        return bookingService.findUserBookings(userId, enumState, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> findOwnerBookings(@RequestHeader(HEADER) long userId,
-                                                 @RequestParam(defaultValue = "all") String state) {
-        log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}", userId, state);
+                                                 @RequestParam(defaultValue = "all") String state,
+                                                 @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                 @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+        log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
+                "количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)
                 .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
-        return bookingService.findOwnerBookings(userId, enumState);
+        return bookingService.findOwnerBookings(userId, enumState, from, size);
     }
 }

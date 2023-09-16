@@ -3,11 +3,12 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.RequestDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -19,6 +20,7 @@ import static ru.practicum.shareit.booking.Constants.HEADER;
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
+@Validated
 public class RequestController {
 
     private final RequestService requestService;
@@ -37,13 +39,19 @@ public class RequestController {
     }
 
     @GetMapping("/all")
-    public Page<RequestDto> getItemRequestsFromOtherUsers( // список ЧУЖИХ запросов
+    public List<RequestDto> getItemRequestsFromOtherUsers( // список ЧУЖИХ запросов
                                                            @RequestHeader(HEADER) long userId,
-                                                           @RequestParam @Valid @NotNull @Positive int from,
-                                                           @RequestParam @Valid @NotNull @Positive int size) {
+                                                           @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                           @RequestParam(defaultValue = "10") @NotNull @Positive int size) {
         log.info("В метод getItemRequestsFromOtherUsers передан userId {}, индекс первого элемента {}, " +
                 "количество элементов на странице {}", userId, from, size);
         return requestService.getItemRequestsFromOtherUsers(userId, from, size);
+    }
+
+    @GetMapping("/{requestId}")
+    public RequestDto getOneItemRequest(@RequestHeader(HEADER) long userId, @PathVariable long requestId) {
+        log.info("В метод getOneItemRequest передан userId: {}, requestId: {}", userId, requestId);
+        return requestService.getOneItemRequest(userId, requestId);
     }
 
 }

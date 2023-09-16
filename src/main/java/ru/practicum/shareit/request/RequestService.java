@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import org.springframework.data.domain.Page;
 import ru.practicum.shareit.request.dto.RequestDto;
 
 import java.util.List;
@@ -10,5 +9,7 @@ public interface RequestService {
 
     List<RequestDto> getUserItemRequests(long userId);
 
-    Page<RequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size);
+    List<RequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size);
+
+    RequestDto getOneItemRequest(long userId, long requestId);
 }
