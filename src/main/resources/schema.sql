@@ -13,9 +13,9 @@ create table if not exists items
     description varchar(200) not null,
     available   boolean      not null,
     request_id  bigint,
-    user_id     bigint       not null,
+    user_id     bigint       not null ,
     constraint "items_users_id_fk"
-        foreign key (user_id) references users
+        foreign key (user_id) references users ON DELETE CASCADE
 );
 
 create table if not exists bookings
@@ -25,10 +25,10 @@ create table if not exists bookings
     end_date   timestamp without time zone not null,
     item_id    bigint                      not null
         constraint bookings_items_id_fk
-            references items,
+            references items ON DELETE CASCADE,
     booker_id  bigint                      not null
         constraint bookings_users_id_fk
-            references users,
+            references users ON DELETE CASCADE,
     status     varchar(15)                 not null
 );
 
@@ -38,10 +38,10 @@ create table if not exists comments
     text      varchar(600)                not null,
     item_id   bigint                      not null
         constraint comments_items_id_fk
-            references items,
+            references items ON DELETE CASCADE,
     author_id bigint                      not null
         constraint comments_users_id_fk
-            references users,
+            references users ON DELETE CASCADE,
     created   timestamp without time zone not null
 );
 
@@ -51,7 +51,7 @@ create table if not exists requests
     description  varchar(200) not null,
     user_id      bigint       not null
     constraint "users_items_id_fk"
-        references users,
+        references users ON DELETE CASCADE,
     created   timestamp without time zone not null
 );
 

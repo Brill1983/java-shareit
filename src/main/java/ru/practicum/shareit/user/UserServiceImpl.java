@@ -3,7 +3,9 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -13,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceIml implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
