@@ -19,6 +19,7 @@ import static ru.practicum.shareit.booking.Constants.HEADER;
 
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {

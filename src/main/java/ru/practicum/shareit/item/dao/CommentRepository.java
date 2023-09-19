@@ -14,12 +14,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "join i.user as u " +
             "where u.id = ?1 " +
             "order by c.created desc")
-    List<Comment> findCommentsForItemsByOwnerId(Long userId);
+    List<Comment> findCommentsForItemsByOwnerId(Long userId); //TODO переписать
 
     @Query("select c " +
             "from Comment as c " +
             "join c.item as i " +
             "where i.id = ?1 " +
             "order by c.created desc ")
-    List<Comment> findCommentsByItemId(Long itemId);
+    List<Comment> findCommentsByItemId(Long itemId); //TODO переписать
 }

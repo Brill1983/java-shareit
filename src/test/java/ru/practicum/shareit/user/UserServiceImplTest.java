@@ -39,7 +39,6 @@ class UserServiceImplTest {
         TypedQuery<User> query = em.createQuery("select u from User u where u.email = :email", User.class);
         User user = query.setParameter("email", userDto.getEmail())
                 .getSingleResult();
-
         assertThat(user.getId(), equalTo(1L));
         assertThat(user.getName(), equalTo(userDto.getName()));
         assertThat(user.getEmail(), equalTo((userDto.getEmail())));
