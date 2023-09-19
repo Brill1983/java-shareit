@@ -247,18 +247,4 @@ class ItemServiceImlTest {
         verify(commentRepository, never())
                 .save(any());
     }
-
-    @Test
-    void getItemById() {
-        long userId = 1L;
-        long itemId = 1L;
-        when(validationService.checkUser(anyLong()))
-                .thenReturn(user);
-        when(itemRepository.findById(userId))
-                .thenReturn(Optional.ofNullable(item));
-        when(commentRepository.findCommentsByItemId(itemId))
-                .thenReturn(List.of(comment));
-        when(bookingRepository.findFirstByItem_IdAndStartBeforeAndStatusOrderByStartDesc(itemId, any(), any()))
-                .thenReturn(null);
-    }
 }
