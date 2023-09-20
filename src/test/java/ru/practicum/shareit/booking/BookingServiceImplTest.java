@@ -9,17 +9,9 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.BadParameterException;
-import ru.practicum.shareit.exceptions.BookingNotFoundException;
-import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
-import ru.practicum.shareit.item.ItemServiceImpl;
-import ru.practicum.shareit.item.dao.CommentRepository;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.dao.ItemRepository;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.dao.RequestRepository;
 import ru.practicum.shareit.service.ValidationService;
 import ru.practicum.shareit.user.model.User;
 
@@ -29,7 +21,6 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -95,10 +86,10 @@ class BookingServiceImplTest {
     void saveBookingWithWrongUserId() {
         long userId = 3L;
         when(validationService.checkUser(anyLong()))
-                .thenThrow(new UserNotFoundException("Пользователь с таким ID не зарегистрировано"));
+                .thenThrow(new ElementNotFoundException("Пользователь с таким ID не зарегистрировано"));
         try {
             bookingService.saveBooking(userId, bookingDtoIn);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с таким ID не зарегистрировано"));
         }
 
@@ -116,10 +107,10 @@ class BookingServiceImplTest {
         when(validationService.checkUser(anyLong()))
                 .thenReturn(user2);
         when(itemRepository.findById(anyLong()))
-                .thenThrow(new ItemNotFoundException("Предмета с ID " + bookingDtoIn.getItemId() + " не зарегистрировано"));
+                .thenThrow(new ElementNotFoundException("Предмета с ID " + bookingDtoIn.getItemId() + " не зарегистрировано"));
         try {
             bookingService.saveBooking(userId, bookingDtoIn);
-        } catch (ItemNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Предмета с ID " + bookingDtoIn.getItemId() + " не зарегистрировано"));
         }
 
@@ -162,7 +153,7 @@ class BookingServiceImplTest {
                 .thenReturn(Optional.ofNullable(item));
         try {
             bookingService.saveBooking(userId, bookingDtoIn);
-        } catch (ItemNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Где-то ошибка: запрос аренды отправлен от владельца вещи"));
         }
 
@@ -209,10 +200,10 @@ class BookingServiceImplTest {
         long bookingId = 1L;
         boolean approved = true;
         when(validationService.checkUser(anyLong()))
-                .thenThrow(new UserNotFoundException("Пользователь с таким ID не зарегистрировано"));
+                .thenThrow(new ElementNotFoundException("Пользователь с таким ID не зарегистрировано"));
         try {
             bookingService.bookingApprove(userId, bookingId, approved);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с таким ID не зарегистрировано"));
         }
 
@@ -236,7 +227,7 @@ class BookingServiceImplTest {
 
         try {
             bookingService.bookingApprove(userId, bookingId, approved);
-        } catch (BookingNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь ID " + userId + " не является владельцем вещи с ID " + booking.getItem().getId() + " и не может менять одобрить/отклонить запрос на аренду этой вещи"));
         }
 
@@ -303,7 +294,7 @@ class BookingServiceImplTest {
 
         try {
             bookingService.findBookingById(userId, bookingId);
-        } catch (BookingNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь " + userId + " не создавал бронь с ID " + bookingId +
                     " и не является владельцем вещи " + booking.getItem().getId()));
         }

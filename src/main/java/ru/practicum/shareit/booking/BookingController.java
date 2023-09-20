@@ -52,7 +52,7 @@ public class BookingController {
     public List<BookingDtoOut> findUserBookings(@RequestHeader(HEADER) long userId,
                                                 @RequestParam(defaultValue = "all") String state,
                                                 @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+                                                @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
                 "количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)
@@ -64,7 +64,7 @@ public class BookingController {
     public List<BookingDtoOut> findOwnerBookings(@RequestHeader(HEADER) long userId,
                                                  @RequestParam(defaultValue = "all") String state,
                                                  @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                 @RequestParam(defaultValue = "20") @NotNull @Positive int size) {
+                                                 @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
                 "количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)

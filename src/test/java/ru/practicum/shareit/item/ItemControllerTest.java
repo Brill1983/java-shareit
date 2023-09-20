@@ -79,8 +79,7 @@ class ItemControllerTest {
     @Test
     void saveItemWithEmptyName() throws Exception {
         itemDto.setName("");
-        when(itemService.createItem(anyLong(), any()))
-                .thenReturn(itemDto);
+
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -96,8 +95,7 @@ class ItemControllerTest {
     @Test
     void saveItemWithNullName() throws Exception {
         itemDto.setName(null);
-        when(itemService.createItem(anyLong(), any()))
-                .thenReturn(itemDto);
+
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -113,8 +111,7 @@ class ItemControllerTest {
     @Test
     void saveItemWithEmptyDescription() throws Exception {
         itemDto.setDescription("");
-        when(itemService.createItem(anyLong(), any()))
-                .thenReturn(itemDto);
+
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -130,8 +127,7 @@ class ItemControllerTest {
     @Test
     void saveItemWithNullDescription() throws Exception {
         itemDto.setDescription(null);
-        when(itemService.createItem(anyLong(), any()))
-                .thenReturn(itemDto);
+
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -147,8 +143,7 @@ class ItemControllerTest {
     @Test
     void saveItemWithNullAvailable() throws Exception {
         itemDto.setAvailable(null);
-        when(itemService.createItem(anyLong(), any()))
-                .thenReturn(itemDto);
+
         mvc.perform(post("/items")
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)

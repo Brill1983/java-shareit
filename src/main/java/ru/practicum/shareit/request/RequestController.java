@@ -41,7 +41,7 @@ public class RequestController {
     @GetMapping("/all")
     public List<RequestDto> getItemRequestsFromOtherUsers(@RequestHeader(HEADER) long userId,
                                                            @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                           @RequestParam(defaultValue = "10") @NotNull @Positive int size) {
+                                                           @RequestParam(defaultValue = "10") @Positive int size) {
         log.info("В метод getItemRequestsFromOtherUsers передан userId {}, индекс первого элемента {}, " +
                 "количество элементов на странице {}", userId, from, size);
         return requestService.getItemRequestsFromOtherUsers(userId, from, size);

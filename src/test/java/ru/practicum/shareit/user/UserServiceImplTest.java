@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -76,7 +76,7 @@ class UserServiceImplTest {
         UserDto userDtoForUpdate = makeUserDto("Петр Петрович", "pp@mail.ru");
         try {
             service.updateUser(userDtoForUpdate, 2L);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + 2L + " не зарегистрирован"));
         }
     }
@@ -96,7 +96,7 @@ class UserServiceImplTest {
     void getUserByIdWithWrongUserId() {
         try {
             service.getUserById(2L);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + 2L + " не зарегистрирован"));
         }
     }
@@ -121,7 +121,7 @@ class UserServiceImplTest {
     void deleteUserWithWrongId() {
         try {
             service.deleteUser(2L);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + 2L + " не зарегистрирован"));
         }
     }

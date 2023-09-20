@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -335,7 +335,7 @@ public class BookingServiceImplTestWithContext {
         BookingState bookingState = BookingState.ALL;
         try {
             bookingService.findUserBookings(userId, bookingState, from, size);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + userId + " не зарегистрирован"));
         }
     }
@@ -350,7 +350,7 @@ public class BookingServiceImplTestWithContext {
         BookingState bookingState = BookingState.ALL;
         try {
             bookingService.findOwnerBookings(userId, bookingState, from, size);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + userId + " не зарегистрирован"));
         }
     }

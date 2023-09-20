@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exceptions.RequestNotFoundException;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -63,7 +63,7 @@ public class RequestServiceImpl implements RequestService {
     public RequestDto getOneItemRequest(long userId, long requestId) {
         validationService.checkUser(userId);
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new RequestNotFoundException("Запроса с ID: " + requestId + " нет в базе"));
+                .orElseThrow(() -> new ElementNotFoundException("Запроса с ID: " + requestId + " нет в базе"));
         List<ItemDto> itemDtos = itemRepository.findAllByRequest_IdInOrderById(List.of(requestId)).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

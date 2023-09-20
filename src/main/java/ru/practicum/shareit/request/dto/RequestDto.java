@@ -23,5 +23,5 @@ public class RequestDto {
 
     private LocalDateTime created;
 
-    private List<ItemDto> items /*= new ArrayList<>()*/;
+    private List<ItemDto> items;
 }

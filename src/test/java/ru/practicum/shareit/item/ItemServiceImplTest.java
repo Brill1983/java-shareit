@@ -8,9 +8,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exceptions.BadParameterException;
-import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.RequestNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -94,10 +92,10 @@ class ItemServiceImplTest {
     void createItemWithWrongUserId() {
         long userId = 1L;
         when(validationService.checkUser(anyLong()))
-                .thenThrow(new UserNotFoundException("Пользователь с таким ID не зарегистрировано"));
+                .thenThrow(new ElementNotFoundException("Пользователь с таким ID не зарегистрировано"));
         try {
             service.createItem(userId, itemDto);
-        } catch (UserNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с таким ID не зарегистрировано"));
         }
 
@@ -116,10 +114,10 @@ class ItemServiceImplTest {
         when(validationService.checkUser(anyLong()))
                 .thenReturn(user);
         when(requestRepository.findById(itemDto.getRequestId()))
-                .thenThrow(new RequestNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
+                .thenThrow(new ElementNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
         try {
             service.createItem(1L, itemDto);
-        } catch (RequestNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
         }
 
@@ -176,7 +174,7 @@ class ItemServiceImplTest {
 
         try {
             service.updateItem(userId, itemDto, itemId);
-        } catch (ItemNotFoundException thrown) {
+        } catch (ElementNotFoundException thrown) {
             assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено"));
         }
         verify(validationService, times(1))

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
@@ -17,11 +18,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ItemMapperTest {
 
+    User user;
+    Request request;
+    Item item;
+    ItemDto itemDto;
+    CommentDto comment;
+    BookingDtoForItem bookingLastDto;
+    BookingDtoForItem bookingNextDto;
+
+
+    @BeforeEach
+    void beforeEach() {
+        user = new User(1L, "Иван Иванович", "ii@mail.ru");
+        request = new Request(1L, "Request 1", user, LocalDateTime.now());
+        item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
+        bookingLastDto = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
+        bookingNextDto = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
+        itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), request.getId());
+        comment = new CommentDto(1L, "Коммент 1", itemDto, user.getName(), LocalDateTime.now());
+    }
+
     @Test
     void toItemDto() {
-        User user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        Request request = new Request(1L, "Request 1", user, LocalDateTime.now());
-        Item item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
+
 
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
@@ -34,14 +53,6 @@ class ItemMapperTest {
 
     @Test
     void testToItemDto() {
-        BookingDtoForItem bookingLastDto = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
-        BookingDtoForItem bookingNextDto = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
-        User user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        Request request = new Request(1L, "Request 1", user, LocalDateTime.now());
-        Item item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
-        ItemDto itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), request.getId());
-        CommentDto comment = new CommentDto(1L, "Коммент 1", itemDto, user.getName(), LocalDateTime.now());
-
         ItemDtoDated itemFromMapper = ItemMapper.toItemDto(item, bookingLastDto, bookingNextDto, List.of(comment));
 
         assertEquals(item.getId(), itemFromMapper.getId());
@@ -63,11 +74,6 @@ class ItemMapperTest {
 
     @Test
     void toItem() {
-        User user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        Request request = new Request(1L, "Request 1", user, LocalDateTime.now());
-        Item item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
-        ItemDto itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), request.getId());
-
         Item mapperItem = ItemMapper.toItem(itemDto, user, request);
 
         assertEquals(itemDto.getId(), mapperItem.getId());
@@ -85,11 +91,6 @@ class ItemMapperTest {
 
     @Test
     void testToItem() {
-        User user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        Request request = new Request(1L, "Request 1", user, LocalDateTime.now());
-        Item item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
-        ItemDto itemDto = new ItemDto(1L, "Вещь странная", null, false, request.getId());
-
         Item mapperItem = ItemMapper.toItem(itemDto, item, request);
 
         assertEquals(itemDto.getId(), mapperItem.getId());
@@ -97,7 +98,6 @@ class ItemMapperTest {
         assertEquals(item.getDescription(), mapperItem.getDescription());
         assertEquals(itemDto.getAvailable(), mapperItem.getAvailable());
         assertEquals(request.getId(), mapperItem.getRequest().getId());
-        assertNotNull(request.getCreated());
         assertEquals(request.getDescription(), mapperItem.getRequest().getDescription());
     }
 }
