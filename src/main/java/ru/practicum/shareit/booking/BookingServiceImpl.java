@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.BookingNotFoundException;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
@@ -39,9 +40,9 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new BadParameterException("У выбранной для аренды вещи статус: недоступна");
         }
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
-            throw new BadParameterException("В запросе аренды дата/время возврата должна быть строго позже начала аренды");
-        }
+//        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
+//            throw new BadParameterException("В запросе аренды дата/время возврата должна быть строго позже начала аренды");
+//        }
         if (user.getId().equals(item.getUser().getId())) {
             throw new ItemNotFoundException("Где-то ошибка: запрос аренды отправлен от владельца вещи");
         }
@@ -52,10 +53,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDtoOut bookingApprove(long userId, long bookingId, boolean approved) {
+        validationService.checkUser(userId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Запроса на аренду с ID " + bookingId + " не зарегистрировано"));
-        if (booking.getItem().getUser().getId() != userId) {
-            throw new BookingNotFoundException("У пользователя с ID " + userId + " нет запроса на аренду с ID " + bookingId);
+        if (booking.getItem().getUser().getId() != userId) { //TODO CHECK
+//            if (booking.getItem().getUser().getId() != userId) {
+//            throw new BookingNotFoundException("У пользователя с ID " + userId + " нет запроса на аренду с ID " + bookingId);
+            throw new BookingNotFoundException("Пользователь ID " + userId + " не является владельцем вещи с ID " + booking.getItem().getId() + " и не может менять одобрить/отклонить запрос на аренду этой вещи");
         }
         if (booking.getStatus() == Status.WAITING) {
             if (approved) {
