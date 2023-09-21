@@ -108,7 +108,7 @@ class RequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.*", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].id", is(requestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(requestDto.getDescription())))
                 .andExpect(jsonPath("$[0].created", notNullValue()));
 
@@ -132,7 +132,7 @@ class RequestControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(requestDtoList))) //TODO поработать со списками в других тестовых классах контроллеров.
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.*", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].id", is(requestDto.getId()), Long.class))
                 .andExpect(jsonPath("$[0].description", is(requestDto.getDescription())))
                 .andExpect(jsonPath("$[0].created", notNullValue()));
 

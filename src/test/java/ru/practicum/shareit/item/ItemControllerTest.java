@@ -19,7 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -181,10 +182,12 @@ class ItemControllerTest {
     void getItemById() throws Exception {
         when(itemService.getItemById(anyLong(), anyLong()))
                 .thenReturn(itemDtoDated);
+
         mvc.perform(get("/items/1")
                         .header(HEADER, 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemDtoDated)));
+
         verify(itemService, times(1))
                 .getItemById(anyLong(), anyLong());
     }
@@ -197,7 +200,16 @@ class ItemControllerTest {
         mvc.perform(get("/items")
                         .header(HEADER, 1L))
                 .andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(itemList)));
+                .andExpect(content().json(mapper.writeValueAsString(itemList)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(itemDtoDated.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(itemDtoDated.getName())))
+                .andExpect(jsonPath("$[0].description", is(itemDtoDated.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(itemDtoDated.getAvailable())))
+                .andExpect(jsonPath("$[0].lastBooking", notNullValue()))
+                .andExpect(jsonPath("$[0].nextBooking", notNullValue()))
+                .andExpect(jsonPath("$[0].comments.*", hasSize(1)));
 
         verify(itemService, times(1))
                 .getUserItems(anyLong(), anyInt(), anyInt());

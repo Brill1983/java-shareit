@@ -31,20 +31,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleConstraintViolationExc(ConstraintViolationException e) {
-//        log.info("Validation: {}", e.getMessage());
-//        return new ErrorResponse(e.getMessage());
-//    }
-//
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-//        log.info("Validation: {}", e.getMessage());
-//        return new ErrorResponse(e.getMessage());
-//    }
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundExc(ElementNotFoundException e) {

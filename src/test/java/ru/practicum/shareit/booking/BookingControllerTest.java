@@ -18,8 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -220,7 +219,14 @@ class BookingControllerTest {
                         .param("state", state)
                         .param("from", String.valueOf(from))
                         .param("size", String.valueOf(size)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(bookingList)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(bookingDtoOut.getId()), Long.class))
+                .andExpect(jsonPath("$[0].status", is(bookingDtoOut.getStatus().toString())))
+                .andExpect(jsonPath("$[0].start", notNullValue()))
+                .andExpect(jsonPath("$[0].end", notNullValue()));
 
         verify(bookingService, times(1))
                 .findUserBookings(userId, enumState, from, size);
@@ -312,7 +318,14 @@ class BookingControllerTest {
                         .param("state", state)
                         .param("from", String.valueOf(from))
                         .param("size", String.valueOf(size)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(bookingList)))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(bookingDtoOut.getId()), Long.class))
+                .andExpect(jsonPath("$[0].status", is(bookingDtoOut.getStatus().toString())))
+                .andExpect(jsonPath("$[0].start", notNullValue()))
+                .andExpect(jsonPath("$[0].end", notNullValue()));
 
         verify(bookingService, times(1))
                 .findOwnerBookings(userId, enumState, from, size);

@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    User user;
-    UserDto userDto;
+    private User user;
+    private UserDto userDto;
 
     @BeforeEach
     void beforeEach() {

@@ -15,7 +15,6 @@ import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -43,7 +42,6 @@ public class ItemServiceImplTestWithContext {
     private BookingDtoIn bookingLastDtoIn;
     private BookingDtoIn bookingNextDtoIn;
     private UserDto userDto;
-    private User user;
 
     @BeforeEach
     void beforeEach() {
@@ -51,7 +49,6 @@ public class ItemServiceImplTestWithContext {
         bookingLastDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
         bookingNextDtoIn = new BookingDtoIn(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
-        user = new User(1L, "Иван Иванович", "ii@mail.ru");
 
         userService.createUser(userDto);
     }
@@ -99,24 +96,34 @@ public class ItemServiceImplTestWithContext {
         bookingService.saveBooking(2l, bookingLastDtoIn);
         bookingService.saveBooking(2l, bookingNextDtoIn);
 
-        ItemDtoDated item = itemService.getItemById(userId, itemId);
-        assertThat(item.getId(), equalTo(itemId));
-        assertThat(item.getName(), equalTo(itemDto.getName()));
-        assertThat(item.getDescription(), equalTo(itemDto.getDescription()));
-        assertThat(item.getAvailable(), equalTo(itemDto.getAvailable()));
-        assertThat(item.getComments(), empty());
+        ItemDtoDated methodItem = itemService.getItemById(userId, itemId);
 
-        assertThat(item.getLastBooking().getId(), equalTo(bookingLastDtoIn.getId()));
-        assertThat(item.getLastBooking().getEnd(), notNullValue());
-        assertThat(item.getLastBooking().getStart(), notNullValue());
-        assertThat(item.getLastBooking().getStatus(), equalTo(bookingLastDtoIn.getStatus()));
-        assertThat(item.getLastBooking().getBookerId(), equalTo(user2.getId()));
+        TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class);
+        Item dbItem = query.setParameter("id", userId)
+                .getSingleResult();
 
-        assertThat(item.getNextBooking().getId(), equalTo(bookingNextDtoIn.getId()));
-        assertThat(item.getNextBooking().getEnd(), notNullValue());
-        assertThat(item.getNextBooking().getStart(), notNullValue());
-        assertThat(item.getNextBooking().getStatus(), equalTo(bookingNextDtoIn.getStatus()));
-        assertThat(item.getNextBooking().getBookerId(), equalTo(user2.getId()));
+        assertThat(methodItem.getId(), equalTo(dbItem.getId()));
+        assertThat(methodItem.getName(), equalTo(dbItem.getName()));
+        assertThat(methodItem.getDescription(), equalTo(dbItem.getDescription()));
+        assertThat(methodItem.getAvailable(), equalTo(dbItem.getAvailable()));
+
+        assertThat(methodItem.getId(), equalTo(itemId));
+        assertThat(methodItem.getName(), equalTo(itemDto.getName()));
+        assertThat(methodItem.getDescription(), equalTo(itemDto.getDescription()));
+        assertThat(methodItem.getAvailable(), equalTo(itemDto.getAvailable()));
+        assertThat(methodItem.getComments(), empty());
+
+        assertThat(methodItem.getLastBooking().getId(), equalTo(bookingLastDtoIn.getId()));
+        assertThat(methodItem.getLastBooking().getEnd(), notNullValue());
+        assertThat(methodItem.getLastBooking().getStart(), notNullValue());
+        assertThat(methodItem.getLastBooking().getStatus(), equalTo(bookingLastDtoIn.getStatus()));
+        assertThat(methodItem.getLastBooking().getBookerId(), equalTo(user2.getId()));
+
+        assertThat(methodItem.getNextBooking().getId(), equalTo(bookingNextDtoIn.getId()));
+        assertThat(methodItem.getNextBooking().getEnd(), notNullValue());
+        assertThat(methodItem.getNextBooking().getStart(), notNullValue());
+        assertThat(methodItem.getNextBooking().getStatus(), equalTo(bookingNextDtoIn.getStatus()));
+        assertThat(methodItem.getNextBooking().getBookerId(), equalTo(user2.getId()));
 
     }
 
@@ -130,16 +137,26 @@ public class ItemServiceImplTestWithContext {
         bookingService.saveBooking(user2.getId(), bookingLastDtoIn);
         bookingService.saveBooking(user2.getId(), bookingNextDtoIn);
 
-        ItemDtoDated item = itemService.getItemById(userId, itemId);
-        assertThat(item.getId(), equalTo(itemId));
-        assertThat(item.getName(), equalTo(itemDto.getName()));
-        assertThat(item.getDescription(), equalTo(itemDto.getDescription()));
-        assertThat(item.getAvailable(), equalTo(itemDto.getAvailable()));
-        assertThat(item.getComments(), empty());
+        ItemDtoDated methodItem = itemService.getItemById(userId, itemId);
 
-        assertThat(item.getLastBooking(), nullValue());
+        TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class);
+        Item dbItem = query.setParameter("id", itemId)
+                .getSingleResult();
 
-        assertThat(item.getNextBooking(), nullValue());
+        assertThat(methodItem.getId(), equalTo(dbItem.getId()));
+        assertThat(methodItem.getName(), equalTo(dbItem.getName()));
+        assertThat(methodItem.getDescription(), equalTo(dbItem.getDescription()));
+        assertThat(methodItem.getAvailable(), equalTo(dbItem.getAvailable()));
+
+        assertThat(methodItem.getId(), equalTo(itemId));
+        assertThat(methodItem.getName(), equalTo(itemDto.getName()));
+        assertThat(methodItem.getDescription(), equalTo(itemDto.getDescription()));
+        assertThat(methodItem.getAvailable(), equalTo(itemDto.getAvailable()));
+        assertThat(methodItem.getComments(), empty());
+
+        assertThat(methodItem.getLastBooking(), nullValue());
+
+        assertThat(methodItem.getNextBooking(), nullValue());
     }
 
     @Test
@@ -156,7 +173,16 @@ public class ItemServiceImplTestWithContext {
 
         List<ItemDtoDated> itemsList = itemService.getUserItems(userId, from, size);
 
+        TypedQuery<Item> query = em.createQuery("select i from Item i where i.user.id = :id", Item.class);
+        List<Item> items = query.setParameter("id", userId)
+                .getResultList();
+
         assertThat(itemsList.size(), equalTo(1));
+        assertThat(itemsList.size(), equalTo(items.size()));
+        assertThat(itemsList.get(0).getId(), equalTo(items.get(0).getId()));
+        assertThat(itemsList.get(0).getDescription(), equalTo(items.get(0).getDescription()));
+        assertThat(itemsList.get(0).getName(), equalTo(items.get(0).getName()));
+        assertThat(itemsList.get(0).getAvailable(), equalTo(items.get(0).getAvailable()));
 
         assertThat(itemsList.get(0).getId(), equalTo(itemDto.getId()));
         assertThat(itemsList.get(0).getName(), equalTo(itemDto.getName()));

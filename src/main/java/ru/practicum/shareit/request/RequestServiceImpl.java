@@ -41,7 +41,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getUserItemRequests(long userId) {
         validationService.checkUser(userId);
-        //TODO paging
         List<Request> requests = requestRepository.findAllByUser_IdOrderByCreatedDesc(userId);
         List<Long> itemRequestsIds = requests.stream()
                 .map(Request::getId)
