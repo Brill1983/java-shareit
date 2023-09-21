@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 
-import javax.validation.ConstraintValidatorContext;
-
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,23 +12,34 @@ class StartBeforeEndValidatorTest {
 
     @Test
     void isValid() {
+
         StartBeforeEndValidator validator = new StartBeforeEndValidator();
-        StartEndChecker checker = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5), 1L, Status.APPROVED);
+        BookingDtoIn bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5), 1L, Status.APPROVED);
 
+        boolean result = validator.isValid(bookingDtoIn, null);
 
+        assertTrue(result);
     }
 
-//    @Override
-//    public boolean isValid(StartEndChecker checker, ConstraintValidatorContext context) {
-//        if (checker == null || checker.getStart() == null || checker.getEnd() == null) {
-//            return true;
-//        }
-//        if (checker.getEnd().isBefore(checker.getStart())) {
-//            return false;
-//        }
-//        if (checker.getStart().isEqual(checker.getEnd())) {
-//            return false;
-//        }
-//        return true;
-//    }
+    @Test
+    void isNotValidStartAfterEnd() {
+
+        StartBeforeEndValidator validator = new StartBeforeEndValidator();
+        BookingDtoIn bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusHours(5), 1L, Status.APPROVED);
+
+        boolean result = validator.isValid(bookingDtoIn, null);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void isNotValidStartIsEqualEnd() {
+
+        StartBeforeEndValidator validator = new StartBeforeEndValidator();
+        BookingDtoIn bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now(), LocalDateTime.now(), 1L, Status.APPROVED);
+
+        boolean result = validator.isValid(bookingDtoIn, null);
+
+        assertFalse(result);
+    }
 }

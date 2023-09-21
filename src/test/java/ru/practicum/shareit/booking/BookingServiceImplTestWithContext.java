@@ -34,18 +34,16 @@ public class BookingServiceImplTestWithContext {
     private final ItemService itemService;
     private final UserService userService;
 
-    Item item;
-    ItemDto itemDto;
-    User user;
-    User user2;
-    UserDto userDto;
-    UserDto userDto2;
-    BookingDtoIn bookingDtoIn;
+    private Item item;
+    private ItemDto itemDto;
+    private User user;
+    private UserDto userDto;
+    private UserDto userDto2;
+    private BookingDtoIn bookingDtoIn;
 
     @BeforeEach
     void beforeEach() {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        user2 = new User(2L, "Петр Петрович", "pp@mail.ru");
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         userDto2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
         item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, null);
