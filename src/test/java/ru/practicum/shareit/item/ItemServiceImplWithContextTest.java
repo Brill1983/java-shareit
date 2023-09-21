@@ -10,11 +10,15 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -28,7 +32,7 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Sql(scripts = "classpath:data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-public class ItemServiceImplTestWithContext {
+public class ItemServiceImplWithContextTest {
 
     private final EntityManager em;
 
@@ -42,6 +46,9 @@ public class ItemServiceImplTestWithContext {
     private BookingDtoIn bookingLastDtoIn;
     private BookingDtoIn bookingNextDtoIn;
     private UserDto userDto;
+    private CommentDto comment;
+    private Item item;
+    private User user;
 
     @BeforeEach
     void beforeEach() {
@@ -49,6 +56,9 @@ public class ItemServiceImplTestWithContext {
         bookingLastDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
         bookingNextDtoIn = new BookingDtoIn(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
+        user = new User(1L, "Иван Иванович", "ii@mail.ru");
+        item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, null);
+        comment = new CommentDto(1L, "Коммент 1", itemDto, user.getName(), LocalDateTime.now());
 
         userService.createUser(userDto);
     }
@@ -170,12 +180,30 @@ public class ItemServiceImplTestWithContext {
         itemService.createItem(userDto.getId(), itemDto);
         bookingService.saveBooking(user2.getId(), bookingLastDtoIn);
         bookingService.saveBooking(user2.getId(), bookingNextDtoIn);
+        itemService.saveComment(user2.getId(), itemDto.getId(), comment);
 
         List<ItemDtoDated> itemsList = itemService.getUserItems(userId, from, size);
 
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.user.id = :id", Item.class);
         List<Item> items = query.setParameter("id", userId)
                 .getResultList();
+
+        TypedQuery<Comment> query1 = em.createQuery("select c from Comment c where c.item.user.id = :id order by c.created desc ", Comment.class);
+        List<Comment> comments = query1.setParameter("id", userId)
+                .getResultList();
+
+        TypedQuery<Booking> query2 = em.createQuery("select b from Booking b where b.item.user.id = :userId and b.item.id in :itemId and b.start < :time order by b.start desc ", Booking.class);
+        List<Booking> lastBookings = query2.setParameter("userId", userId)
+                .setParameter("itemId", List.of(item.getId()))
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        TypedQuery<Booking> query3 = em.createQuery("select b from Booking b where b.item.user.id = :userId and b.item.id in :itemId and b.start > :time order by b.start ", Booking.class);
+        List<Booking> nextBookings = query3.setParameter("userId", userId)
+                .setParameter("itemId", List.of(item.getId()))
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
 
         assertThat(itemsList.size(), equalTo(1));
         assertThat(itemsList.size(), equalTo(items.size()));
@@ -184,11 +212,30 @@ public class ItemServiceImplTestWithContext {
         assertThat(itemsList.get(0).getName(), equalTo(items.get(0).getName()));
         assertThat(itemsList.get(0).getAvailable(), equalTo(items.get(0).getAvailable()));
 
+        assertThat(itemsList.get(0).getComments().size(), equalTo(comments.size()));
+        assertThat(itemsList.get(0).getComments().get(0).getId(), equalTo(comments.get(0).getId()));
+        assertThat(itemsList.get(0).getComments().get(0).getText(), equalTo(comments.get(0).getText()));
+        assertThat(itemsList.get(0).getComments().get(0).getCreated(), notNullValue());
+        assertThat(itemsList.get(0).getComments().get(0).getItem().getId(), equalTo(comments.get(0).getItem().getId()));
+
+        assertThat(itemsList.get(0).getLastBooking().getId(), equalTo(lastBookings.get(0).getId()));
+        assertThat(itemsList.get(0).getLastBooking().getStatus(), equalTo(lastBookings.get(0).getStatus()));
+        assertThat(itemsList.get(0).getLastBooking().getBookerId(), equalTo(lastBookings.get(0).getBooker().getId()));
+        assertThat(itemsList.get(0).getLastBooking().getEnd(), notNullValue());
+        assertThat(itemsList.get(0).getLastBooking().getStart(), notNullValue());
+        assertThat(lastBookings.get(0).getItem().getId(), equalTo(item.getId()));
+
+        assertThat(itemsList.get(0).getNextBooking().getId(), equalTo(nextBookings.get(0).getId()));
+        assertThat(itemsList.get(0).getNextBooking().getStatus(), equalTo(nextBookings.get(0).getStatus()));
+        assertThat(itemsList.get(0).getNextBooking().getBookerId(), equalTo(nextBookings.get(0).getBooker().getId()));
+        assertThat(itemsList.get(0).getNextBooking().getEnd(), notNullValue());
+        assertThat(itemsList.get(0).getNextBooking().getStart(), notNullValue());
+        assertThat(nextBookings.get(0).getItem().getId(), equalTo(item.getId()));
+
         assertThat(itemsList.get(0).getId(), equalTo(itemDto.getId()));
         assertThat(itemsList.get(0).getName(), equalTo(itemDto.getName()));
         assertThat(itemsList.get(0).getDescription(), equalTo(itemDto.getDescription()));
         assertThat(itemsList.get(0).getAvailable(), equalTo(itemDto.getAvailable()));
-        assertThat(itemsList.get(0).getComments(), empty());
 
         assertThat(itemsList.get(0).getLastBooking().getId(), equalTo(bookingLastDtoIn.getId()));
         assertThat(itemsList.get(0).getLastBooking().getEnd(), notNullValue());
