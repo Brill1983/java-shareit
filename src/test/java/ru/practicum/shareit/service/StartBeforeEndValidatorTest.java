@@ -36,7 +36,11 @@ class StartBeforeEndValidatorTest {
     void isNotValidStartIsEqualEnd() {
 
         StartBeforeEndValidator validator = new StartBeforeEndValidator();
-        BookingDtoIn bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now(), LocalDateTime.now(), 1L, Status.APPROVED);
+        BookingDtoIn bookingDtoIn = new BookingDtoIn(1L,
+                LocalDateTime.of(2023, 9,21, 23,20),
+                LocalDateTime.of(2023, 9,21, 23,20),
+                1L,
+                Status.APPROVED);
 
         boolean result = validator.isValid(bookingDtoIn, null);
 
