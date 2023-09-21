@@ -8,15 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,7 +35,6 @@ public class BookingServiceImplTestWithContext {
     private final ItemService itemService;
     private final UserService userService;
 
-    private Item item;
     private ItemDto itemDto;
     private User user;
     private UserDto userDto;
@@ -46,9 +46,8 @@ public class BookingServiceImplTestWithContext {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         userDto2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
-        item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, null);
         itemDto = new ItemDto(1L,"Вещь 1", "Описание вещи 1", true, null);
-        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), item.getId(), Status.APPROVED);
+        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), itemDto.getId(), Status.APPROVED);
 
         userService.createUser(userDto);
         userService.createUser(userDto2);
@@ -57,23 +56,38 @@ public class BookingServiceImplTestWithContext {
 
     @Test
     void findAllUserBookings() {
-        bookingService.saveBooking(userDto2.getId(), bookingDtoIn); // старт  в будущем, окончание в будущем
+        bookingService.saveBooking(userDto2.getId(), bookingDtoIn);
 
         long userId = 2L;
         int from = 0;
         int size = 5;
         BookingState bookingState = BookingState.ALL;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking b " +
+                "where b.booker.id = :id " +
+                "order by b.start desc", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -86,16 +100,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.CURRENT;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking as b " +
+                "join b.booker as bo " +
+                "where bo.id = :id and b.start < :time and b.end > :time " +
+                "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -109,16 +140,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.PAST;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking as b " +
+                "join b.booker as bo " +
+                "where bo.id = :id and b.end < :time and b.status = 'APPROVED' " +
+                "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -132,16 +180,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.FUTURE;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.booker as bo " +
+                        "where bo.id = :id and b.start > :time " +
+                        "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -154,16 +219,32 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.WAITING;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking as b " +
+                "join b.booker as bo " +
+                "where bo.id = :id and b.status = 'WAITING' " +
+                "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -176,16 +257,32 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.REJECTED;
 
-        List<BookingDtoOut> bookingList = bookingService.findUserBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking as b " +
+                "join b.booker as bo " +
+                "where bo.id = :id and b.status = 'REJECTED' " +
+                "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     //_______________________________________________________________________________
@@ -199,16 +296,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.ALL;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id " +
+                "order by b.start desc", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -221,16 +335,34 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.CURRENT;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.item as i " +
+                        "join i.user as u " +
+                        "where u.id = :id and b.start < :time and b.end > :time " +
+                        "order by b.start desc", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -244,16 +376,34 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.PAST;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.item as i " +
+                        "join i.user as u " +
+                        "where u.id = :id and b.end < :time and b.status = 'APPROVED' " +
+                        "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -267,16 +417,34 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.FUTURE;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.item as i " +
+                        "join i.user as u " +
+                        "where u.id = :id and b.start > :time " +
+                        "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .setParameter("time", LocalDateTime.now())
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -289,16 +457,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.WAITING;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.item as i " +
+                        "join i.user as u " +
+                        "where u.id = :id and b.status = 'WAITING' " +
+                        "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
@@ -311,16 +496,33 @@ public class BookingServiceImplTestWithContext {
         int size = 5;
         BookingState bookingState = BookingState.REJECTED;
 
-        List<BookingDtoOut> bookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
+        List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
-        assertThat(bookingList.size(), equalTo(1));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
-        assertThat(bookingList.get(0).getEnd(), notNullValue());
-        assertThat(bookingList.get(0).getStart(), notNullValue());
-        assertThat(bookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
-        assertThat(bookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
-        assertThat(bookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
-        assertThat(bookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        TypedQuery<Booking> query = em.createQuery("select b " +
+                        "from Booking as b " +
+                        "join b.item as i " +
+                        "join i.user as u " +
+                        "where u.id = :id and b.status = 'REJECTED' " +
+                        "order by b.start desc ", Booking.class);
+        List<Booking> itemsFromDb = query.setParameter("id", userId)
+                .getResultList();
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(itemsFromDb.get(0).getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(itemsFromDb.get(0).getBooker().getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(itemsFromDb.get(0).getItem().getId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(itemsFromDb.get(0).getStatus()));
+
+        assertThat(dbBookingList.size(), equalTo(1));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
+        assertThat(dbBookingList.get(0).getEnd(), notNullValue());
+        assertThat(dbBookingList.get(0).getStart(), notNullValue());
+        assertThat(dbBookingList.get(0).getBooker().getId(), equalTo(userDto2.getId()));
+        assertThat(dbBookingList.get(0).getItem().getId(), equalTo(bookingDtoIn.getItemId()));
+        assertThat(dbBookingList.get(0).getStatus(), equalTo(bookingDtoIn.getStatus()));
+        assertThat(dbBookingList.get(0).getId(), equalTo(bookingDtoIn.getId()));
     }
 
     @Test
