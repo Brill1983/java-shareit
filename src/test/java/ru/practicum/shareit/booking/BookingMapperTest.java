@@ -19,14 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BookingMapperTest {
 
-    Booking booking;
-    BookingDtoIn bookingDtoIn;
-//    BookingDtoForItem bookingDtoForItem;
-    Item item;
-    ItemDto itemDto;
-    User user;
-    UserDto userDto;
-    Request request;
+    private Booking booking;
+    private BookingDtoIn bookingDtoIn;
+    private Item item;
+    private ItemDto itemDto;
+    private User user;
+    private UserDto userDto;
+    private Request request;
 
     @BeforeEach
     void beforeEach() {

@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ItemMapperTest {
 
-    User user;
-    Request request;
-    Item item;
-    ItemDto itemDto;
-    CommentDto comment;
-    BookingDtoForItem bookingLastDto;
-    BookingDtoForItem bookingNextDto;
+    private User user;
+    private Request request;
+    private Item item;
+    private ItemDto itemDto;
+    private CommentDto comment;
+    private BookingDtoForItem bookingLastDto;
+    private BookingDtoForItem bookingNextDto;
 
 
     @BeforeEach

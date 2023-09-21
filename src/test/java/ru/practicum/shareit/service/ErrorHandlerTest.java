@@ -69,24 +69,4 @@ class ErrorHandlerTest {
 
         assertNotNull(errorResponse.getError());
     }
-
-//    @Test
-//    void handleMethodArgumentNotValidExc() {
-//        String message = "Ошибка";
-//
-//
-//
-//        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "objectName");
-//        bindingResult.addError(new FieldError("objectName", "field1", "Ошибка"));
-//
-//        Method method = Integer.getClass().getMethod("toString", (Class<?>[]) null);
-//        MethodParameter parameter = new MethodParameter(method, -1);
-//
-//        MethodArgumentNotValidException exc = new MethodArgumentNotValidException(parameter, bindingResult);
-//
-//        ErrorResponse errorResponse = errorHandler.handleOtherExc(exc);
-//
-//        assertNotNull(errorResponse.getError());
-//        assertEquals(message, errorResponse.getError());
-//    }
 }

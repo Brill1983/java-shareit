@@ -33,11 +33,11 @@ class BookingServiceImplTest {
     private BookingRepository bookingRepository;
     private ItemRepository itemRepository;
 
-    Item item;
-    User user;
-    User user2;
-    Booking booking;
-    BookingDtoIn bookingDtoIn;
+    private Item item;
+    private User user;
+    private User user2;
+    private Booking booking;
+    private BookingDtoIn bookingDtoIn;
 
 
     @BeforeEach
