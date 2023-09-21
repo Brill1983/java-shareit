@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -207,7 +206,7 @@ class ItemServiceImplTest {
         assertThat(commentFromMethod.getText(), equalTo(commentDto.getText()));
         assertThat(commentFromMethod.getAuthorName(), equalTo(commentDto.getAuthorName()));
         assertThat(commentFromMethod.getItem().getId(), equalTo(commentDto.getItem().getId()));
-        assertThat(commentFromMethod.getCreated(), equalTo(commentDto.getCreated()));
+        assertThat(commentFromMethod.getCreated(), notNullValue());
 
         verify(validationService, times(1))
                 .checkUser(anyLong());

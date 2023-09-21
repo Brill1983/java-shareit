@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -152,7 +151,8 @@ class UserControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(userDto)))
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
-                .andExpect(jsonPath("$.email", is(userDto.getEmail())));;
+                .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+        ;
 
         verify(userService, times(1))
                 .getUserById(anyLong());

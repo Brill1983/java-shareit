@@ -6,14 +6,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.ElementNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javax.validation.ConstraintViolationException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ErrorHandlerTest {
 
     private ErrorHandler errorHandler;
 
     @BeforeEach
-    void beforeEach(){
+    void beforeEach() {
         errorHandler = new ErrorHandler();
     }
 
@@ -28,7 +31,7 @@ class ErrorHandlerTest {
     }
 
     @Test
-    void handleBadParameterExcWithBadParameterException() {
+    void handleBadParameterExc() {
         String message = "Ошибка";
 
         BadParameterException exc = new BadParameterException(message);
@@ -57,4 +60,33 @@ class ErrorHandlerTest {
 
         assertNotNull(errorResponse.getError());
     }
+
+    @Test
+    void handleConstraintViolationExc() {
+        ConstraintViolationException exc = new ConstraintViolationException(null);
+
+        ErrorResponse errorResponse = errorHandler.handleOtherExc(exc);
+
+        assertNotNull(errorResponse.getError());
+    }
+
+//    @Test
+//    void handleMethodArgumentNotValidExc() {
+//        String message = "Ошибка";
+//
+//
+//
+//        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "objectName");
+//        bindingResult.addError(new FieldError("objectName", "field1", "Ошибка"));
+//
+//        Method method = Integer.getClass().getMethod("toString", (Class<?>[]) null);
+//        MethodParameter parameter = new MethodParameter(method, -1);
+//
+//        MethodArgumentNotValidException exc = new MethodArgumentNotValidException(parameter, bindingResult);
+//
+//        ErrorResponse errorResponse = errorHandler.handleOtherExc(exc);
+//
+//        assertNotNull(errorResponse.getError());
+//        assertEquals(message, errorResponse.getError());
+//    }
 }

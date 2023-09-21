@@ -93,8 +93,8 @@ public class ItemServiceImplTestWithContext {
         UserDto user2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
         userService.createUser(user2);
         itemService.createItem(userDto.getId(), itemDto);
-        bookingService.saveBooking(2l, bookingLastDtoIn);
-        bookingService.saveBooking(2l, bookingNextDtoIn);
+        bookingService.saveBooking(2L, bookingLastDtoIn);
+        bookingService.saveBooking(2L, bookingNextDtoIn);
 
         ItemDtoDated methodItem = itemService.getItemById(userId, itemId);
 

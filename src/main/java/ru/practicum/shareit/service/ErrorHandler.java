@@ -24,9 +24,23 @@ public class ErrorHandler {
         return new ErrorResponse("Пользователь с такой почтой уже зарегистрирован");
     }
 
-    @ExceptionHandler({BadParameterException.class, ConstraintViolationException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadParameterExc(BadParameterException e) {
+        log.info("Validation: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintViolationExc(ConstraintViolationException e) {
+        log.info("Validation: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMethodArgumentNotValidExc(MethodArgumentNotValidException e) {
         log.info("Validation: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }

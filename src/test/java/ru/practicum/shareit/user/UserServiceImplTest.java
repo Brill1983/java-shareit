@@ -112,7 +112,7 @@ class UserServiceImplTest {
         try {
             query.setParameter("id", 1L)
                     .getSingleResult();
-        } catch(NoResultException thrown) {
+        } catch (NoResultException thrown) {
             assertThat(thrown.getMessage(), equalTo("No entity found for query"));
         }
     }
@@ -142,7 +142,7 @@ class UserServiceImplTest {
 
         assertThat(receivedUsers, hasSize(users.size()));
         for (UserDto user : users) {
-            assertThat(receivedUsers, hasItem( allOf(
+            assertThat(receivedUsers, hasItem(allOf(
                     hasProperty("id", notNullValue()),
                     hasProperty("name", equalTo(user.getName())),
                     hasProperty("email", equalTo(user.getEmail()))

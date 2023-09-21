@@ -47,9 +47,9 @@ class ValidationServiceTest {
         User user = new User(1L, "Иван Иванович", "ii@mail.ru");
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
-        try{
+        try {
             validationService.checkUser(1L);
-        } catch(ElementNotFoundException e) {
+        } catch (ElementNotFoundException e) {
             assertThat(e.getMessage(), equalTo("Пользователь с ID " + 1L + " не зарегистрирован"));
         }
     }
