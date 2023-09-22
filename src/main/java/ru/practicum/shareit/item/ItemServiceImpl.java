@@ -46,7 +46,8 @@ public class ItemServiceImpl implements ItemService {
         Request request = null;
         if (itemDto.getRequestId() != null) {
             request = requestRepository.findById(itemDto.getRequestId())
-                    .orElseThrow(() -> new ElementNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
+                    .orElseThrow(() -> new ElementNotFoundException("Запроса с ID " + itemDto.getRequestId()
+                            + " нет в базе"));
         }
         Item itemFromDto = ItemMapper.toItem(itemDto, user, request);
         Item item = itemRepository.save(itemFromDto);
@@ -60,12 +61,14 @@ public class ItemServiceImpl implements ItemService {
         Item itemFromRep = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ElementNotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
         if (itemFromRep.getUser().getId() != userId) {
-            throw new ElementNotFoundException("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено");
+            throw new ElementNotFoundException("Пользователь с ID " + userId + " не является владельцем вещи c ID "
+                    + itemId + ". Изменение запрещено");
         }
         Request request = null;
         if (itemDto.getRequestId() != null) {
             request = requestRepository.findById(itemDto.getRequestId())
-                    .orElseThrow(() -> new ElementNotFoundException("Запроса с ID " + itemDto.getRequestId() + " нет в базе"));
+                    .orElseThrow(() -> new ElementNotFoundException("Запроса с ID " + itemDto.getRequestId()
+                            + " нет в базе"));
         }
         Item item = ItemMapper.toItem(itemDto, itemFromRep, request);
         item.setId(itemId);
@@ -79,8 +82,7 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
         Pageable page = PageRequest.of(from / size, size);
-        List<Item> itemsList = itemRepository.findByNameOrDescription(text, page);
-        return itemsList.stream()
+        return itemRepository.findByNameOrDescription(text, page).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -96,11 +98,16 @@ public class ItemServiceImpl implements ItemService {
         if (item.getUser().getId() != userId) {
             return ItemMapper.toItemDto(item, null, null, comments);
         }
-        Booking lastBookings = bookingRepository.findFirstByItem_IdAndStartBeforeAndStatusOrderByStartDesc(itemId, LocalDateTime.now(), Status.APPROVED)
+        Booking lastBookings = bookingRepository.findFirstByItem_IdAndStartBeforeAndStatusOrderByStartDesc(itemId,
+                        LocalDateTime.now(), Status.APPROVED)
                 .orElse(null);
-        Booking nextBookings = bookingRepository.findFirstByItem_IdAndStartAfterAndStatusOrderByStart(itemId, LocalDateTime.now(), Status.APPROVED)
+        Booking nextBookings = bookingRepository.findFirstByItem_IdAndStartAfterAndStatusOrderByStart(itemId,
+                        LocalDateTime.now(), Status.APPROVED)
                 .orElse(null);
-        return ItemMapper.toItemDto(item, BookingMapper.toItemBookingDto(lastBookings), BookingMapper.toItemBookingDto(nextBookings), comments);
+        return ItemMapper.toItemDto(item,
+                BookingMapper.toItemBookingDto(lastBookings),
+                BookingMapper.toItemBookingDto(nextBookings),
+                comments);
     }
 
     @Override
@@ -109,14 +116,16 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable page = PageRequest.of(from / size, size);
 
-        List<Item> items = itemRepository.findAllByUserIdOrderById(userId, page);
+        List<Item> items = itemRepository.findAllByUserIdOrderById(userId, page).getContent();
         List<Long> itemsIds = items.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
 
         List<ItemDtoDated> datedItemList = new ArrayList<>();
-        List<Booking> lastBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartBeforeOrderByStartDesc(userId, itemsIds, LocalDateTime.now());
-        List<Booking> nextBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartAfterOrderByStart(userId, itemsIds, LocalDateTime.now());
+        List<Booking> lastBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartBeforeOrderByStartDesc(
+                userId, itemsIds, LocalDateTime.now());
+        List<Booking> nextBookings = bookingRepository.findAllByItem_User_IdAndItem_IdInAndStartAfterOrderByStart(
+                userId, itemsIds, LocalDateTime.now());
         List<Comment> comments = commentRepository.findAllByItem_User_IdOrderByCreatedDesc(userId);
 
         for (Item item : items) {
@@ -140,7 +149,9 @@ public class ItemServiceImpl implements ItemService {
                     commentList.add(CommentMapper.toCommentDto(comment));
                 }
             }
-            datedItemList.add(ItemMapper.toItemDto(item, BookingMapper.toItemBookingDto(lastBooking), BookingMapper.toItemBookingDto(nextBooking), commentList));
+            datedItemList.add(ItemMapper.toItemDto(item,
+                    BookingMapper.toItemBookingDto(lastBooking),
+                    BookingMapper.toItemBookingDto(nextBooking), commentList));
         }
         return datedItemList;
     }
@@ -154,7 +165,8 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookings = bookingRepository.findAllByItem_IdAndBooker_IdAndStatusAndStartBeforeAndEndBefore(
                 itemId, userId, Status.APPROVED, LocalDateTime.now(), LocalDateTime.now());
         if (bookings.isEmpty()) {
-            throw new BadParameterException("Пользователь " + userId + " не арендовал вещь " + itemId + ". Не имеет права писать отзыв");
+            throw new BadParameterException("Пользователь " + userId + " не арендовал вещь " + itemId
+                    + ". Не имеет права писать отзыв");
         }
         Comment comment = CommentMapper.toComment(commentDto, item, user);
 

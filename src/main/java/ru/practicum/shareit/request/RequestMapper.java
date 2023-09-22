@@ -18,7 +18,6 @@ public class RequestMapper {
                 requestDto.getDescription(),
                 user,
                 requestDto.getCreated() != null ? requestDto.getCreated() : LocalDateTime.now()
-
         );
     }
 

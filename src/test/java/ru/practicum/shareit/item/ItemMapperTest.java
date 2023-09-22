@@ -32,8 +32,10 @@ class ItemMapperTest {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         request = new Request(1L, "Request 1", user, LocalDateTime.now());
         item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
-        bookingLastDto = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
-        bookingNextDto = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
+        bookingLastDto = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1),
+                LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
+        bookingNextDto = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12),
+                LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
         itemDto = new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable(), request.getId());
         comment = new CommentDto(1L, "Коммент 1", itemDto, user.getName(), LocalDateTime.now());
     }

@@ -54,7 +54,7 @@ public class RequestServiceImpl implements RequestService {
         validationService.checkUser(userId);
         List<Item> items = itemRepository.findByRequest_User_IdNot(userId);
         Pageable page = PageRequest.of(from, size);
-        List<Request> requests = requestRepository.findAllByUser_IdNot(userId, page);
+        List<Request> requests = requestRepository.findAllByUser_IdNot(userId, page).getContent();
         return collectRequestDtoList(requests, items);
     }
 

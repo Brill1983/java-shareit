@@ -48,8 +48,10 @@ class BookingControllerTest {
     public void itemCreate() {
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, null);
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
-        bookingDtoOut = new BookingDtoOut(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5), itemDto, userDto, Status.APPROVED);
-        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5), itemDto.getId(), Status.APPROVED);
+        bookingDtoOut = new BookingDtoOut(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5),
+                itemDto, userDto, Status.APPROVED);
+        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(5),
+                itemDto.getId(), Status.APPROVED);
     }
 
     @Test

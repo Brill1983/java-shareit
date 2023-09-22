@@ -45,16 +45,16 @@ class ItemRepositoryTest {
     @Test
     void findByNameOrDescription() {
         String text = "ИсаНи";
-        List<Item> itemsList = itemRepository.findByNameOrDescription(text, Pageable.unpaged());
+        List<Item> items = itemRepository.findByNameOrDescription(text, Pageable.unpaged()).getContent();
 
-        assertThat(itemsList.size(), equalTo(2));
-        assertThat(itemsList.get(0).getId(), equalTo(item.getId()));
+        assertThat(items.size(), equalTo(2));
+        assertThat(items.get(0).getId(), equalTo(item.getId()));
     }
 
     @Test
     void findByNothingNameOrDescription() {
         String text = "кирпичный";
-        List<Item> itemsList = itemRepository.findByNameOrDescription(text, Pageable.unpaged());
+        List<Item> itemsList = itemRepository.findByNameOrDescription(text, Pageable.unpaged()).getContent();
 
         assertThat(itemsList.size(), equalTo(0));
     }

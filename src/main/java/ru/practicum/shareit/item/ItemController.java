@@ -23,10 +23,11 @@ import static ru.practicum.shareit.booking.Constants.HEADER;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
-    public ItemDto saveItem(@RequestHeader(HEADER) long userId, @RequestBody @Validated({Create.class}) ItemDto itemDto) {
+    public ItemDto saveItem(@RequestHeader(HEADER) long userId,
+                            @RequestBody @Validated({Create.class}) ItemDto itemDto) {
         log.info("В метод saveItem передан userId {}, itemDto.name: {}, itemDto.description: {}, itemDto.avaliable {}",
                 userId, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
         return itemService.createItem(userId, itemDto);
@@ -36,7 +37,8 @@ public class ItemController {
     public ItemDto updateItem(@RequestHeader(HEADER) long userId,
                               @RequestBody ItemDto itemDto,
                               @PathVariable long itemId) {
-        log.info("В метод updateItem передан userId {}, itemId {}, itemDto.name: {}, itemDto.description: {}, itemDto.avaliable {}",
+        log.info("В метод updateItem передан userId {}, itemId {}, itemDto.name: {}, itemDto.description: {}, " +
+                        "itemDto.avaliable {}",
                 userId, itemId, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
         return itemService.updateItem(userId, itemDto, itemId);
     }
@@ -51,7 +53,8 @@ public class ItemController {
     public List<ItemDtoDated> getUserItems(@RequestHeader(HEADER) long userId,
                                            @RequestParam(defaultValue = "0") @Min(0) int from,
                                            @RequestParam(defaultValue = "20") @Positive int size) {
-        log.info("В метод getUserItems передан userId {}, индекс первого элемента {}, количество элементов на странице {}", userId, from, size);
+        log.info("В метод getUserItems передан userId {}, индекс первого элемента {}, количество элементов на " +
+                "странице {}", userId, from, size);
         return itemService.getUserItems(userId, from, size);
     }
 
@@ -59,7 +62,8 @@ public class ItemController {
     public List<ItemDto> search(@RequestParam String text,
                                 @RequestParam(defaultValue = "0") @Min(0) int from,
                                 @RequestParam(defaultValue = "20") @Positive int size) {
-        log.info("В метод search передан text: '{}', индекс первого элемента {}, количество элементов на странице {}", text, from, size);
+        log.info("В метод search передан text: '{}', индекс первого элемента {}, количество элементов на " +
+                "странице {}", text, from, size);
         return itemService.search(text, from, size);
     }
 

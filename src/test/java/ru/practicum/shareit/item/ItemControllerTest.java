@@ -50,10 +50,13 @@ class ItemControllerTest {
     @BeforeEach
     public void itemCreate() {
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, null);
-        bookingLast = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
-        bookingNext = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 2L, Status.APPROVED);
+        bookingLast = new BookingDtoForItem(1L, LocalDateTime.now().minusDays(1),
+                LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
+        bookingNext = new BookingDtoForItem(2L, LocalDateTime.now().plusHours(12),
+                LocalDateTime.now().plusDays(1), 2L, Status.APPROVED);
         commentDto = new CommentDto(1L, "Коммент 1", itemDto, "Иван Иванович", LocalDateTime.now());
-        itemDtoDated = new ItemDtoDated(1L, "Вещь 1", "Описание вещи 1", true, bookingLast, bookingNext, List.of(commentDto));
+        itemDtoDated = new ItemDtoDated(1L, "Вещь 1", "Описание вещи 1", true, bookingLast,
+                bookingNext, List.of(commentDto));
     }
 
     @Test

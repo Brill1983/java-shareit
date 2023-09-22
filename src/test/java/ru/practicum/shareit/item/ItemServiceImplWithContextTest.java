@@ -53,8 +53,10 @@ public class ItemServiceImplWithContextTest {
     @BeforeEach
     void beforeEach() {
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, null);
-        bookingLastDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
-        bookingNextDtoIn = new BookingDtoIn(2L, LocalDateTime.now().plusHours(12), LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
+        bookingLastDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1),
+                LocalDateTime.now().minusHours(5), 1L, Status.APPROVED);
+        bookingNextDtoIn = new BookingDtoIn(2L, LocalDateTime.now().plusHours(12),
+                LocalDateTime.now().plusDays(1), 1L, Status.APPROVED);
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, null);
@@ -184,21 +186,32 @@ public class ItemServiceImplWithContextTest {
 
         List<ItemDtoDated> itemsList = itemService.getUserItems(userId, from, size);
 
-        TypedQuery<Item> query = em.createQuery("select i from Item i where i.user.id = :id", Item.class);
+        TypedQuery<Item> query = em.createQuery("select i " +
+                "from Item i " +
+                "where i.user.id = :id", Item.class);
         List<Item> items = query.setParameter("id", userId)
                 .getResultList();
 
-        TypedQuery<Comment> query1 = em.createQuery("select c from Comment c where c.item.user.id = :id order by c.created desc ", Comment.class);
+        TypedQuery<Comment> query1 = em.createQuery("select c " +
+                "from Comment c " +
+                "where c.item.user.id = :id " +
+                "order by c.created desc ", Comment.class);
         List<Comment> comments = query1.setParameter("id", userId)
                 .getResultList();
 
-        TypedQuery<Booking> query2 = em.createQuery("select b from Booking b where b.item.user.id = :userId and b.item.id in :itemId and b.start < :time order by b.start desc ", Booking.class);
+        TypedQuery<Booking> query2 = em.createQuery("select b " +
+                "from Booking b " +
+                "where b.item.user.id = :userId and b.item.id in :itemId and b.start < :time " +
+                "order by b.start desc ", Booking.class);
         List<Booking> lastBookings = query2.setParameter("userId", userId)
                 .setParameter("itemId", List.of(item.getId()))
                 .setParameter("time", LocalDateTime.now())
                 .getResultList();
 
-        TypedQuery<Booking> query3 = em.createQuery("select b from Booking b where b.item.user.id = :userId and b.item.id in :itemId and b.start > :time order by b.start ", Booking.class);
+        TypedQuery<Booking> query3 = em.createQuery("select b " +
+                "from Booking b " +
+                "where b.item.user.id = :userId and b.item.id in :itemId and b.start > :time " +
+                "order by b.start ", Booking.class);
         List<Booking> nextBookings = query3.setParameter("userId", userId)
                 .setParameter("itemId", List.of(item.getId()))
                 .setParameter("time", LocalDateTime.now())

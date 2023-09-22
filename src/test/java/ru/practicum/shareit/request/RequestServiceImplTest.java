@@ -120,7 +120,9 @@ class RequestServiceImplTest {
 
         List<RequestDto> methodRequestList = requestService.getItemRequestsFromOtherUsers(userDto3.getId(), from, size);
 
-        TypedQuery<Request> query = em.createQuery("select r from Request r where r.user.id <> :id", Request.class);
+        TypedQuery<Request> query = em.createQuery("select r " +
+                "from Request r " +
+                "where r.user.id <> :id", Request.class);
         List<Request> dbRequestList = query.setParameter("id", userDto3.getId())
                 .getResultList();
 
@@ -129,7 +131,9 @@ class RequestServiceImplTest {
         assertThat(methodRequestList.get(0).getDescription(), equalTo(dbRequestList.get(0).getDescription()));
         assertThat(methodRequestList.get(0).getCreated(), notNullValue());
 
-        TypedQuery<Item> query1 = em.createQuery("select i from Item i where i.request.user.id <> :id", Item.class);
+        TypedQuery<Item> query1 = em.createQuery("select i " +
+                "from Item i " +
+                "where i.request.user.id <> :id", Item.class);
         List<Item> dbItems = query1.setParameter("id", userDto3.getId())
                 .getResultList();
 
@@ -161,7 +165,9 @@ class RequestServiceImplTest {
 
         RequestDto methodRequest = requestService.getOneItemRequest(userId, requestId);
 
-        TypedQuery<Request> query = em.createQuery("select r from Request r where r.id = :id", Request.class);
+        TypedQuery<Request> query = em.createQuery("select r " +
+                "from Request r " +
+                "where r.id = :id", Request.class);
         Request dbRequest = query.setParameter("id", requestId)
                 .getSingleResult();
 
@@ -169,7 +175,9 @@ class RequestServiceImplTest {
         assertThat(methodRequest.getDescription(), equalTo(dbRequest.getDescription()));
         assertThat(methodRequest.getCreated(), notNullValue());
 
-        TypedQuery<Item> query1 = em.createQuery("select i from Item i where i.request.id = :id", Item.class);
+        TypedQuery<Item> query1 = em.createQuery("select i " +
+                "from Item i " +
+                "where i.request.id = :id", Item.class);
         List<Item> dbItems = query1.setParameter("id", requestId)
                 .getResultList();
 

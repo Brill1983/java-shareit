@@ -34,8 +34,10 @@ class BookingMapperTest {
         request = new Request(1L, "Request 1", user, LocalDateTime.now());
         item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, request);
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, request.getId());
-        booking = new Booking(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), item, user, Status.APPROVED);
-        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), item.getId(), Status.APPROVED);
+        booking = new Booking(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5), item,
+                user, Status.APPROVED);
+        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusHours(5),
+                item.getId(), Status.APPROVED);
     }
 
     @Test
@@ -54,7 +56,6 @@ class BookingMapperTest {
         assertEquals(booking.getBooker().getId(), bookingDto.getBooker().getId());
         assertEquals(booking.getBooker().getName(), bookingDto.getBooker().getName());
         assertEquals(booking.getBooker().getEmail(), bookingDto.getBooker().getEmail());
-
     }
 
     @Test

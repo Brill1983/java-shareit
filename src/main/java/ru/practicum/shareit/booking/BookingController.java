@@ -37,7 +37,8 @@ public class BookingController {
     public BookingDtoOut bookingApprove(@RequestHeader(HEADER) long userId,
                                         @PathVariable long bookingId,
                                         @RequestParam boolean approved) {
-        log.info("В метод bookingApprove передан userId {}, bookingId {}, статус подтверждения {}", userId, bookingId, approved);
+        log.info("В метод bookingApprove передан userId {}, bookingId {}, статус подтверждения {}",
+                userId, bookingId, approved);
         return bookingService.bookingApprove(userId, bookingId, approved);
     }
 
@@ -52,8 +53,8 @@ public class BookingController {
                                                 @RequestParam(defaultValue = "all") String state,
                                                 @RequestParam(defaultValue = "0") @Min(0) int from,
                                                 @RequestParam(defaultValue = "20") @Positive int size) {
-        log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
-                "количество элементов на странице {}", userId, state, from, size);
+        log.info("В метод findUserBookings передан userId {}, статус бронирования для поиска {}, " +
+                "индекс первого элемента {}, количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)
                 .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
         return bookingService.findUserBookings(userId, enumState, from, size);
@@ -64,8 +65,8 @@ public class BookingController {
                                                  @RequestParam(defaultValue = "all") String state,
                                                  @RequestParam(defaultValue = "0") @Min(0) int from,
                                                  @RequestParam(defaultValue = "20") @Positive int size) {
-        log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}, индекс первого элемента {}, " +
-                "количество элементов на странице {}", userId, state, from, size);
+        log.info("В метод findOwnerBookings передан userId {}, статус бронирования для поиска {}, " +
+                "индекс первого элемента {}, количество элементов на странице {}", userId, state, from, size);
         BookingState enumState = BookingState.from(state)
                 .orElseThrow(() -> new BadParameterException("Unknown state: " + state));
         return bookingService.findOwnerBookings(userId, enumState, from, size);

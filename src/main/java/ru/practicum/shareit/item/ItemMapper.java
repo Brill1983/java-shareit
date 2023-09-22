@@ -25,7 +25,10 @@ public class ItemMapper {
         );
     }
 
-    public static ItemDtoDated toItemDto(Item item, BookingDtoForItem lastBooking, BookingDtoForItem nextBooking, List<CommentDto> comments) {
+    public static ItemDtoDated toItemDto(Item item,
+                                         BookingDtoForItem lastBooking,
+                                         BookingDtoForItem nextBooking,
+                                         List<CommentDto> comments) {
         return new ItemDtoDated(
                 item.getId(),
                 item.getName(),

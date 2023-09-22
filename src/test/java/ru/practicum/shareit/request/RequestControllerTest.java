@@ -42,7 +42,8 @@ class RequestControllerTest {
 
     @BeforeEach
     public void itemCreate() {
-        requestDto = new RequestDto(1L, "Описание запроса", LocalDateTime.now(), null);
+        requestDto = new RequestDto(1L, "Описание запроса",
+                LocalDateTime.now(), null);
     }
 
     @Test
@@ -129,7 +130,7 @@ class RequestControllerTest {
                         .param("from", String.valueOf(from))
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(requestDtoList))) //TODO поработать со списками в других тестовых классах контроллеров.
+                .andExpect(content().json(mapper.writeValueAsString(requestDtoList)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(requestDto.getId()), Long.class))

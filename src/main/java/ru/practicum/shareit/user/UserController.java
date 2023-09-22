@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @PostMapping
     public UserDto saveUser(@RequestBody @Validated({Create.class}) UserDto userDto) {
@@ -26,7 +26,8 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@RequestBody @Validated({Update.class}) UserDto userDto, @PathVariable long userId) {
-        log.info("В метод updateUser передан userId {}, userDto.name {}, userDto.email {}", userId, userDto.getName(), userDto.getEmail());
+        log.info("В метод updateUser передан userId {}, userDto.name {}, userDto.email {}",
+                userId, userDto.getName(), userDto.getEmail());
         return userService.updateUser(userDto, userId);
     }
 

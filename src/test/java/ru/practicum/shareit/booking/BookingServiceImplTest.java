@@ -45,8 +45,10 @@ class BookingServiceImplTest {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         user2 = new User(2L, "Петр Петрович", "pp@mail.ru");
         item = new Item(1L, "Вещь 1", "Описание вещи 1", true, user, null);
-        booking = new Booking(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), item, user2, Status.APPROVED);
-        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), item.getId(), Status.APPROVED);
+        booking = new Booking(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), item,
+                user2, Status.APPROVED);
+        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1),
+                item.getId(), Status.APPROVED);
 
         validationService = mock(ValidationService.class);
         itemRepository = mock(ItemRepository.class);
@@ -107,11 +109,13 @@ class BookingServiceImplTest {
         when(validationService.checkUser(anyLong()))
                 .thenReturn(user2);
         when(itemRepository.findById(anyLong()))
-                .thenThrow(new ElementNotFoundException("Предмета с ID " + bookingDtoIn.getItemId() + " не зарегистрировано"));
+                .thenThrow(new ElementNotFoundException("Предмета с ID " + bookingDtoIn.getItemId()
+                        + " не зарегистрировано"));
         try {
             bookingService.saveBooking(userId, bookingDtoIn);
         } catch (ElementNotFoundException thrown) {
-            assertThat(thrown.getMessage(), equalTo("Предмета с ID " + bookingDtoIn.getItemId() + " не зарегистрировано"));
+            assertThat(thrown.getMessage(), equalTo("Предмета с ID " + bookingDtoIn.getItemId()
+                    + " не зарегистрировано"));
         }
 
         verify(validationService, times(1))
@@ -228,7 +232,9 @@ class BookingServiceImplTest {
         try {
             bookingService.bookingApprove(userId, bookingId, approved);
         } catch (ElementNotFoundException thrown) {
-            assertThat(thrown.getMessage(), equalTo("Пользователь ID " + userId + " не является владельцем вещи с ID " + booking.getItem().getId() + " и не может менять одобрить/отклонить запрос на аренду этой вещи"));
+            assertThat(thrown.getMessage(), equalTo("Пользователь ID " + userId
+                    + " не является владельцем вещи с ID " + booking.getItem().getId()
+                    + " и не может менять одобрить/отклонить запрос на аренду этой вещи"));
         }
 
         verify(validationService, times(1))
@@ -253,7 +259,8 @@ class BookingServiceImplTest {
         try {
             bookingService.bookingApprove(userId, bookingId, approved);
         } catch (BadParameterException thrown) {
-            assertThat(thrown.getMessage(), equalTo("У запроса на аренду с ID " + bookingId + " нельзя поменять статус. Текущий статус: " + booking.getStatus()));
+            assertThat(thrown.getMessage(), equalTo("У запроса на аренду с ID " + bookingId
+                    + " нельзя поменять статус. Текущий статус: " + booking.getStatus()));
         }
 
         verify(validationService, times(1))
@@ -295,7 +302,8 @@ class BookingServiceImplTest {
         try {
             bookingService.findBookingById(userId, bookingId);
         } catch (ElementNotFoundException thrown) {
-            assertThat(thrown.getMessage(), equalTo("Пользователь " + userId + " не создавал бронь с ID " + bookingId +
+            assertThat(thrown.getMessage(), equalTo("Пользователь " + userId
+                    + " не создавал бронь с ID " + bookingId +
                     " и не является владельцем вещи " + booking.getItem().getId()));
         }
 

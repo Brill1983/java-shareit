@@ -47,7 +47,8 @@ public class BookingServiceImplWithContextTest {
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         userDto2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
         itemDto = new ItemDto(1L,"Вещь 1", "Описание вещи 1", true, null);
-        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1), itemDto.getId(), Status.APPROVED);
+        bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1),
+                itemDto.getId(), Status.APPROVED);
 
         userService.createUser(userDto);
         userService.createUser(userDto2);

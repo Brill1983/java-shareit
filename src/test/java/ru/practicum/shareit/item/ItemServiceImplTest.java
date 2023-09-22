@@ -174,7 +174,8 @@ class ItemServiceImplTest {
         try {
             service.updateItem(userId, itemDto, itemId);
         } catch (ElementNotFoundException thrown) {
-            assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + userId + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено"));
+            assertThat(thrown.getMessage(), equalTo("Пользователь с ID " + userId
+                    + " не является владельцем вещи c ID " + itemId + ". Изменение запрещено"));
         }
         verify(validationService, times(1))
                 .checkUser(anyLong());
@@ -232,7 +233,8 @@ class ItemServiceImplTest {
         try {
             service.saveComment(userId, itemId, commentDto);
         } catch (BadParameterException thrown) {
-            assertThat(thrown.getMessage(), equalTo("Пользователь " + userId + " не арендовал вещь " + itemId + ". Не имеет права писать отзыв"));
+            assertThat(thrown.getMessage(), equalTo("Пользователь " + userId + " не арендовал вещь "
+                    + itemId + ". Не имеет права писать отзыв"));
         }
 
         verify(validationService, times(1))
