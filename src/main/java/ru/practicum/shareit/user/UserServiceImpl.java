@@ -3,7 +3,8 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -12,8 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
-public class UserServiceIml implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -27,23 +29,25 @@ public class UserServiceIml implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto, long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+                .orElseThrow(() -> new ElementNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         User userFromDto = UserMapper.toUser(userDto, user);
         userFromDto.setId(userId);
         return UserMapper.toUserDto(userRepository.save(userFromDto));
     }
 
+
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+                .orElseThrow(() -> new ElementNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         return UserMapper.toUserDto(user);
     }
 
     @Override
     public void deleteUser(long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
+                .orElseThrow(() -> new ElementNotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         userRepository.deleteById(userId);
     }
 

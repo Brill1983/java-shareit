@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.dto;
 import lombok.*;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.service.StartBeforeEnd;
-import ru.practicum.shareit.service.StartEndChecker;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @StartBeforeEnd
-public class BookingDtoIn implements StartEndChecker {
+public class BookingDtoIn {
 
     private Long id = 0L;
 

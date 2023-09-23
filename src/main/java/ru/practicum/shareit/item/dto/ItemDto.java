@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ItemDto {
 
     private long id;
@@ -22,4 +23,6 @@ public class ItemDto {
 
     @NotNull(groups = {Create.class}, message = "Передан предмет без указания доступности")
     private Boolean available;
+
+    private Long requestId;
 }

@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -19,11 +20,15 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
 
-    public static ItemDtoDated toItemDto(Item item, BookingDtoForItem lastBooking, BookingDtoForItem nextBooking, List<CommentDto> comments) {
+    public static ItemDtoDated toItemDto(Item item,
+                                         BookingDtoForItem lastBooking,
+                                         BookingDtoForItem nextBooking,
+                                         List<CommentDto> comments) {
         return new ItemDtoDated(
                 item.getId(),
                 item.getName(),
@@ -35,23 +40,25 @@ public class ItemMapper {
         );
     }
 
-    public static Item toItem(ItemDto itemDto, User user) {
+    public static Item toItem(ItemDto itemDto, User user, Request request) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName() != null ? itemDto.getName() : null,
                 itemDto.getDescription() != null ? itemDto.getDescription() : null,
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : null,
-                user
+                user,
+                request
         );
     }
 
-    public static Item toItem(ItemDto itemDto, Item item) {
+    public static Item toItem(ItemDto itemDto, Item item, Request request) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName() != null ? itemDto.getName() : item.getName(),
                 itemDto.getDescription() != null ? itemDto.getDescription() : item.getDescription(),
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : item.getAvailable(),
-                item.getUser()
+                item.getUser(),
+                request
         );
     }
 }

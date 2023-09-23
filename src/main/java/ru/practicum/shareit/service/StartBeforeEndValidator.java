@@ -5,13 +5,19 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class StartBeforeEndValidator implements ConstraintValidator<StartBeforeEnd, StartEndChecker> {
+public class StartBeforeEndValidator implements ConstraintValidator<StartBeforeEnd, BookingDtoIn> {
 
     @Override
-    public boolean isValid(StartEndChecker checker, ConstraintValidatorContext context) {
-        if (checker == null || checker.getStart() == null || checker.getEnd() == null) {
+    public boolean isValid(BookingDtoIn booking, ConstraintValidatorContext context) {
+        if (booking == null || booking.getStart() == null || booking.getEnd() == null) {
             return true;
         }
-        return checker.getEnd().isAfter(checker.getStart()) || checker.getStart().isEqual(checker.getEnd());
+        if (booking.getEnd().isBefore(booking.getStart())) {
+            return false;
+        }
+        if (booking.getStart().isEqual(booking.getEnd())) {
+            return false;
+        }
+        return true;
     }
 }
