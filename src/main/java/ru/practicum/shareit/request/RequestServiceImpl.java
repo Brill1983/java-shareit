@@ -52,9 +52,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size) {
         validationService.checkUser(userId);
-        List<Item> items = itemRepository.findByRequest_User_IdNot(userId);
+
         Pageable page = PageRequest.of(from, size);
         List<Request> requests = requestRepository.findAllByUser_IdNot(userId, page).getContent();
+        List<Long> requestsIds = requests.stream()
+                .map(Request::getId)
+                .collect(Collectors.toList());
+        List<Item> items = itemRepository.findAllByRequest_User_IdNotAndRequest_IdInOrderById(userId, requestsIds);
         return collectRequestDtoList(requests, items);
     }
 
