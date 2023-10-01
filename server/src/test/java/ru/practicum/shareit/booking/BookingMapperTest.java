@@ -49,10 +49,10 @@ class BookingMapperTest {
         assertNotNull(bookingDto.getStart());
         assertNotNull(bookingDto.getEnd());
         assertEquals(booking.getItem().getId(), bookingDto.getItem().getId());
-        assertEquals(booking.getItem().getName(),bookingDto.getItem().getName());
-        assertEquals(booking.getItem().getDescription(),bookingDto.getItem().getDescription());
-        assertEquals(booking.getItem().getAvailable(),bookingDto.getItem().getAvailable());
-        assertEquals(booking.getItem().getRequest().getId(),bookingDto.getItem().getRequestId());
+        assertEquals(booking.getItem().getName(), bookingDto.getItem().getName());
+        assertEquals(booking.getItem().getDescription(), bookingDto.getItem().getDescription());
+        assertEquals(booking.getItem().getAvailable(), bookingDto.getItem().getAvailable());
+        assertEquals(booking.getItem().getRequest().getId(), bookingDto.getItem().getRequestId());
         assertEquals(booking.getBooker().getId(), bookingDto.getBooker().getId());
         assertEquals(booking.getBooker().getName(), bookingDto.getBooker().getName());
         assertEquals(booking.getBooker().getEmail(), bookingDto.getBooker().getEmail());

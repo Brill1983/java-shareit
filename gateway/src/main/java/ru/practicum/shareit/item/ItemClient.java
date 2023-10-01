@@ -50,16 +50,11 @@ public class ItemClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> search(String text, long userId, int from, int size) {
-        Map<String, Object> parameters = Map.of(
-                "text", text,
-                "from", from,
-                "size", size
-        );
-        return get("/search={text}?from={from}&size={size}", userId, parameters);
+    public ResponseEntity<Object> search(String text, long userId) {
+        return get("/search?text=" + text, userId);
     }
 
     public ResponseEntity<Object> saveComment(long userId, long itemId, CommentDto comment) {
-        return  post("/" + itemId + "comment", userId, comment);
+        return post("/" + itemId + "/comment", userId, comment);
     }
 }

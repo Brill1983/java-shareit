@@ -10,7 +10,8 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class RequestMapperTest {
 
@@ -24,7 +25,7 @@ class RequestMapperTest {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         requestDto = new RequestDto(1L, "Описание запроса 1", LocalDateTime.now(), null);
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, 1L);
-        request = new Request(1L,  "Описание вещи 1", user, LocalDateTime.now());
+        request = new Request(1L, "Описание вещи 1", user, LocalDateTime.now());
     }
 
     @Test

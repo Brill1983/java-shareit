@@ -53,39 +53,6 @@ class UserControllerTest {
                 .createUser(any());
     }
 
-//    @Test
-//    void saveUserWrongEmail() throws Exception {
-//        UserDto userDto = new UserDto(1L, "Иван Иванович", "iimail.ru");
-//        when(userService.createUser(any()))
-//                .thenReturn(userDto);
-//        mvc.perform(post("/users")
-//                        .content(mapper.writeValueAsString(userDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(userService, never())
-//                .createUser(any());
-//    }
-
-//    @Test
-//    void saveUserEmailIsNull() throws Exception {
-//        UserDto userDto = new UserDto(1L, "Иван Иванович", null);
-//        when(userService.createUser(any()))
-//                .thenReturn(userDto);
-//        mvc.perform(post("/users")
-//                        .content(mapper.writeValueAsString(userDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(userService, never())
-//                .createUser(any());
-//    }
-
-
     @Test
     void updateUser() throws Exception {
         UserDto userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
@@ -105,22 +72,6 @@ class UserControllerTest {
         verify(userService, times(1))
                 .updateUser(any(), anyLong());
     }
-
-//    @Test
-//    void updateUserWrongEmail() throws Exception {
-//        UserDto userDto = new UserDto(1L, "Иван Иванович", "iimail.ru");
-//        when(userService.updateUser(any(), anyLong()))
-//                .thenReturn(userDto);
-//        mvc.perform(patch("/users/1")
-//                        .content(mapper.writeValueAsString(userDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(userService, never())
-//                .createUser(any());
-//    }
 
     @Test
     void updateUserNullEmail() throws Exception {

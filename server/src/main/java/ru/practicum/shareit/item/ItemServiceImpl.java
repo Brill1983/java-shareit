@@ -5,10 +5,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exceptions.BadParameterException;
 import ru.practicum.shareit.exceptions.ElementNotFoundException;
 import ru.practicum.shareit.item.dao.CommentRepository;
@@ -77,12 +77,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text, int from, int size) {
+    public List<ItemDto> search(String text) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        Pageable page = PageRequest.of(from / size, size);
-        return itemRepository.findByNameOrDescription(text, page).stream()
+        return itemRepository.findByNameOrDescription(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }

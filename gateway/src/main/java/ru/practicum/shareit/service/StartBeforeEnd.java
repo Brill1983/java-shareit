@@ -12,7 +12,7 @@ public @interface StartBeforeEnd {
 
     String message() default "{В запросе аренды дата/время возврата должна быть строго позже начала аренды}";
 
-    Class<?>[] groups() default { };
+    Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default { };
+    Class<? extends Payload>[] payload() default {};
 }

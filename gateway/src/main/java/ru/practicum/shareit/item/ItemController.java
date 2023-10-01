@@ -34,8 +34,8 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(@RequestHeader(HEADER) long userId,
-                              @RequestBody ItemDto itemDto,
-                              @PathVariable long itemId) {
+                                             @RequestBody ItemDto itemDto,
+                                             @PathVariable long itemId) {
         log.info("В метод updateItem передан userId {}, itemId {}, itemDto.name: {}, itemDto.description: {}, " +
                         "itemDto.avaliable {}",
                 userId, itemId, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
@@ -51,8 +51,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getUserItems(@RequestHeader(HEADER) long userId,
-                                           @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                           @RequestParam(defaultValue = "20") @Positive int size) {
+                                               @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                               @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("В метод getUserItems передан userId {}, индекс первого элемента {}, количество элементов на " +
                 "странице {}", userId, from, size);
         return itemClient.getUserItems(userId, from, size);
@@ -60,18 +60,15 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestHeader(HEADER) long userId,
-                                         @RequestParam String text,
-                                         @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                         @RequestParam(defaultValue = "20") @Positive int size) {
-        log.info("В метод search передан передан userId {}, text: '{}', индекс первого элемента {}, количество элементов на " +
-                "странице {}", userId, text, from, size);
-        return itemClient.search(text, userId, from, size);
+                                         @RequestParam String text) {
+        log.info("В метод search передан передан userId {}, text: '{}'", userId, text);
+        return itemClient.search(text, userId);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> saveComment(@RequestHeader(HEADER) long userId,
-                                  @PathVariable long itemId,
-                                  @RequestBody @Valid CommentDto comment) {
+                                              @PathVariable long itemId,
+                                              @RequestBody @Valid CommentDto comment) {
         log.info("В метод saveComment передан userId {}, itemId {}, отзыв с длиной текста: {}",
                 userId, itemId, comment.getText().length());
         return itemClient.saveComment(userId, itemId, comment);

@@ -17,24 +17,19 @@ import ru.practicum.shareit.service.StartBeforeEnd;
 @AllArgsConstructor
 @StartBeforeEnd
 public class BookingDto {
-//	private long itemId;
-//	@FutureOrPresent
-//	private LocalDateTime start;
-//	@Future
-//	private LocalDateTime end;
 
-	private Long id = 0L;
+    private Long id = 0L;
 
-	@NotNull(message = "Нужно указать дату возврата вещи")
-	@FutureOrPresent(message = "Нельзя указывать дату из прошлого")
-	private LocalDateTime start;
+    @NotNull(message = "Нужно указать дату возврата вещи")
+    @FutureOrPresent(message = "Нельзя указывать дату из прошлого")
+    private LocalDateTime start;
 
-	@NotNull(message = "Нужно указать дату возврата вещи")
-	@Future(message = "Нельзя указывать дату из прошлого для возврата вещи")
-	private LocalDateTime end;
+    @NotNull(message = "Нужно указать дату возврата вещи")
+    @Future(message = "Нельзя указывать дату из прошлого для возврата вещи")
+    private LocalDateTime end;
 
-	@NotNull(message = "Нужно указать, какую вещь хотите арендовать")
-	private Long itemId;
+    @NotNull(message = "Нужно указать, какую вещь хотите арендовать")
+    private Long itemId;
 
-	private Status status = Status.WAITING;
+    private Status status = Status.WAITING;
 }

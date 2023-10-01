@@ -16,7 +16,7 @@ public interface ItemService {
 
     List<ItemDtoDated> getUserItems(long userId, int from, int size);
 
-    List<ItemDto> search(String text, int from, int size);
+    List<ItemDto> search(String text);
 
     CommentDto saveComment(long userId, long itemId, CommentDto comment);
 }

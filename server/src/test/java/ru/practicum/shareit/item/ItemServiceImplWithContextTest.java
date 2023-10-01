@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -69,10 +68,9 @@ public class ItemServiceImplWithContextTest {
     @Test
     void search() {
         itemService.createItem(userDto.getId(), itemDto);
-        int from = 0;
-        int size = 5;
+
         String text = "ещ";
-        List<ItemDto> itemsList = itemService.search(text, from, size);
+        List<ItemDto> itemsList = itemService.search(text);
 
         TypedQuery<Item> query = em.createQuery("select it from Item as it where it.available = true and " +
                 "(upper(it.name) like upper(concat('%', :text, '%')) or upper(it.description) " +
@@ -90,10 +88,8 @@ public class ItemServiceImplWithContextTest {
     @Test
     void searchForNoItems() {
         itemService.createItem(userDto.getId(), itemDto);
-        int from = 0;
-        int size = 5;
         String text = "вещьстакойстрокойненайти";
-        List<ItemDto> itemsList = itemService.search(text, from, size);
+        List<ItemDto> itemsList = itemService.search(text);
 
         assertThat(itemsList, empty());
     }

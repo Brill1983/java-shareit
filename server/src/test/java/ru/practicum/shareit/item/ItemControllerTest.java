@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -79,86 +78,6 @@ class ItemControllerTest {
         verify(itemService, times(1))
                 .createItem(anyLong(), any());
     }
-
-//    @Test
-//    void saveItemWithEmptyName() throws Exception {
-//        itemDto.setName("");
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(itemDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1L))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .createItem(anyLong(), any());
-//    }
-
-//    @Test
-//    void saveItemWithNullName() throws Exception {
-//        itemDto.setName(null);
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(itemDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1L))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .createItem(anyLong(), any());
-//    }
-
-//    @Test
-//    void saveItemWithEmptyDescription() throws Exception {
-//        itemDto.setDescription("");
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(itemDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1L))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .createItem(anyLong(), any());
-//    }
-
-//    @Test
-//    void saveItemWithNullDescription() throws Exception {
-//        itemDto.setDescription(null);
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(itemDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1L))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .createItem(anyLong(), any());
-//    }
-
-//    @Test
-//    void saveItemWithNullAvailable() throws Exception {
-//        itemDto.setAvailable(null);
-//
-//        mvc.perform(post("/items")
-//                        .content(mapper.writeValueAsString(itemDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1L))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .createItem(anyLong(), any());
-//    }
 
     @Test
     void updateItem() throws Exception {
@@ -236,75 +155,21 @@ class ItemControllerTest {
                 .getUserItems(anyLong(), anyInt(), anyInt());
     }
 
-//    @Test
-//    void getUserItemsWithBadFromParam() throws Exception {
-//        int from = -1;
-//        int size = 2;
-//        List<ItemDtoDated> itemList = List.of(itemDtoDated);
-//        when(itemService.getUserItems(anyLong(), anyInt(), anyInt()))
-//                .thenReturn(itemList);
-//        mvc.perform(get("/items")
-//                        .header(HEADER, 1L)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .getUserItems(anyLong(), anyInt(), anyInt());
-//    }
-
-//    @Test
-//    void getUserItemsWithNegativeSizeParam() throws Exception {
-//        int from = 0;
-//        int size = -2;
-//        List<ItemDtoDated> itemList = List.of(itemDtoDated);
-//        when(itemService.getUserItems(anyLong(), anyInt(), anyInt()))
-//                .thenReturn(itemList);
-//        mvc.perform(get("/items")
-//                        .header(HEADER, 1L)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .getUserItems(anyLong(), anyInt(), anyInt());
-//    }
-
-//    @Test
-//    void getUserItemsWithNullSizeParam() throws Exception {
-//        int from = 0;
-//        int size = 0;
-//        List<ItemDtoDated> itemList = List.of(itemDtoDated);
-//        when(itemService.getUserItems(anyLong(), anyInt(), anyInt()))
-//                .thenReturn(itemList);
-//        mvc.perform(get("/items")
-//                        .header(HEADER, 1L)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(itemService, never())
-//                .getUserItems(anyLong(), anyInt(), anyInt());
-//    }
-
     @Test
     void search() throws Exception {
-        int from = 0;
-        int size = 2;
+
         String text = "вещ";
         List<ItemDto> itemList = List.of(itemDto);
-        when(itemService.search(text, from, size))
+        when(itemService.search(text))
                 .thenReturn(itemList);
         mvc.perform(get("/items/search")
                         .header(HEADER, 1L)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size))
                         .param("text", text))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemList)));
 
         verify(itemService, times(1))
-                .search(text, from, size);
+                .search(text);
     }
 
     @Test

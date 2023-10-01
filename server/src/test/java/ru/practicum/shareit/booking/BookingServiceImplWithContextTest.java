@@ -46,7 +46,7 @@ public class BookingServiceImplWithContextTest {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         userDto2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
-        itemDto = new ItemDto(1L,"Вещь 1", "Описание вещи 1", true, null);
+        itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, null);
         bookingDtoIn = new BookingDtoIn(1L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusDays(1),
                 itemDto.getId(), Status.APPROVED);
 
@@ -184,10 +184,10 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findUserBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.booker as bo " +
-                        "where bo.id = :id and b.start > :time " +
-                        "order by b.start desc ", Booking.class);
+                "from Booking as b " +
+                "join b.booker as bo " +
+                "where bo.id = :id and b.start > :time " +
+                "order by b.start desc ", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .setParameter("time", LocalDateTime.now())
                 .getResultList();
@@ -339,11 +339,11 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.item as i " +
-                        "join i.user as u " +
-                        "where u.id = :id and b.start < :time and b.end > :time " +
-                        "order by b.start desc", Booking.class);
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id and b.start < :time and b.end > :time " +
+                "order by b.start desc", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .setParameter("time", LocalDateTime.now())
                 .getResultList();
@@ -380,11 +380,11 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.item as i " +
-                        "join i.user as u " +
-                        "where u.id = :id and b.end < :time and b.status = 'APPROVED' " +
-                        "order by b.start desc ", Booking.class);
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id and b.end < :time and b.status = 'APPROVED' " +
+                "order by b.start desc ", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .setParameter("time", LocalDateTime.now())
                 .getResultList();
@@ -421,11 +421,11 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.item as i " +
-                        "join i.user as u " +
-                        "where u.id = :id and b.start > :time " +
-                        "order by b.start desc ", Booking.class);
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id and b.start > :time " +
+                "order by b.start desc ", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .setParameter("time", LocalDateTime.now())
                 .getResultList();
@@ -461,11 +461,11 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.item as i " +
-                        "join i.user as u " +
-                        "where u.id = :id and b.status = 'WAITING' " +
-                        "order by b.start desc ", Booking.class);
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id and b.status = 'WAITING' " +
+                "order by b.start desc ", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .getResultList();
 
@@ -500,11 +500,11 @@ public class BookingServiceImplWithContextTest {
         List<BookingDtoOut> dbBookingList = bookingService.findOwnerBookings(userId, bookingState, from, size);
 
         TypedQuery<Booking> query = em.createQuery("select b " +
-                        "from Booking as b " +
-                        "join b.item as i " +
-                        "join i.user as u " +
-                        "where u.id = :id and b.status = 'REJECTED' " +
-                        "order by b.start desc ", Booking.class);
+                "from Booking as b " +
+                "join b.item as i " +
+                "join i.user as u " +
+                "where u.id = :id and b.status = 'REJECTED' " +
+                "order by b.start desc ", Booking.class);
         List<Booking> itemsFromDb = query.setParameter("id", userId)
                 .getResultList();
 

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dao.RequestRepository;
@@ -45,7 +44,7 @@ class ItemRepositoryTest {
     @Test
     void findByNameOrDescription() {
         String text = "ИсаНи";
-        List<Item> items = itemRepository.findByNameOrDescription(text, Pageable.unpaged()).getContent();
+        List<Item> items = itemRepository.findByNameOrDescription(text);
 
         assertThat(items.size(), equalTo(2));
         assertThat(items.get(0).getId(), equalTo(item.getId()));
@@ -54,7 +53,7 @@ class ItemRepositoryTest {
     @Test
     void findByNothingNameOrDescription() {
         String text = "кирпичный";
-        List<Item> itemsList = itemRepository.findByNameOrDescription(text, Pageable.unpaged()).getContent();
+        List<Item> itemsList = itemRepository.findByNameOrDescription(text);
 
         assertThat(itemsList.size(), equalTo(0));
     }

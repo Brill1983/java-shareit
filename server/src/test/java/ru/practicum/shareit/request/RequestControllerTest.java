@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import ru.practicum.shareit.request.dto.RequestDto;
 
 import java.nio.charset.StandardCharsets;
@@ -66,38 +65,6 @@ class RequestControllerTest {
                 .createItemRequest(anyLong(), any());
     }
 
-//    @Test
-//    void saveItemRequestWithBlankDescription() throws Exception {
-//        requestDto.setDescription("");
-//
-//        mvc.perform(post("/requests")
-//                        .content(mapper.writeValueAsString(requestDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(requestService, never())
-//                .createItemRequest(anyLong(), any());
-//    }
-
-//    @Test
-//    void saveItemRequestWithNullDescription() throws Exception {
-//        requestDto.setDescription(null);
-//
-//        mvc.perform(post("/requests")
-//                        .content(mapper.writeValueAsString(requestDto))
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .header(HEADER, 1))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(requestService, never())
-//                .createItemRequest(anyLong(), any());
-//    }
-
     @Test
     void getItemRequests() throws Exception {
 
@@ -140,51 +107,6 @@ class RequestControllerTest {
         verify(requestService, times(1))
                 .getItemRequestsFromOtherUsers(anyLong(), anyInt(), anyInt());
     }
-
-//    @Test
-//    void getItemRequestsFromOtherUsersWithNegativeFrom() throws Exception {
-//        int from = -1;
-//        int size = 5;
-//
-//        mvc.perform(get("/requests/all")
-//                        .header(HEADER, 1)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(requestService, never())
-//                .getItemRequestsFromOtherUsers(anyLong(), anyInt(), anyInt());
-//    }
-
-//    @Test
-//    void getItemRequestsFromOtherUsersWithNegativeSize() throws Exception {
-//        int from = 0;
-//        int size = -5;
-//
-//        mvc.perform(get("/requests/all")
-//                        .header(HEADER, 1)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(requestService, never())
-//                .getItemRequestsFromOtherUsers(anyLong(), anyInt(), anyInt());
-//    }
-
-//    @Test
-//    void getItemRequestsFromOtherUsersWithNullSize() throws Exception {
-//        int from = 0;
-//        int size = 0;
-//
-//        mvc.perform(get("/requests/all")
-//                        .header(HEADER, 1)
-//                        .param("from", String.valueOf(from))
-//                        .param("size", String.valueOf(size)))
-//                .andExpect(status().isBadRequest());
-//
-//        verify(requestService, never())
-//                .getItemRequestsFromOtherUsers(anyLong(), anyInt(), anyInt());
-//    }
 
     @Test
     void getOneItemRequest() throws Exception {

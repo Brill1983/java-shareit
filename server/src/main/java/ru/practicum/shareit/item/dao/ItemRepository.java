@@ -16,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "from Item as it " +
             "where it.available = true and (upper(it.name) " +
             "like upper(concat('%', ?1, '%')) or upper(it.description) like upper(concat('%', ?1, '%'))) ")
-    Page<Item> findByNameOrDescription(String text, Pageable page);
+    List<Item> findByNameOrDescription(String text);
 
     List<Item> findAllByRequest_IdInOrderById(List<Long> itemRequestIds);
 

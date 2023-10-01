@@ -27,17 +27,6 @@ class ErrorHandlerTest {
         assertEquals(message, errorResponse.getError());
     }
 
-//    @Test
-//    void handleBadParameterExc() {
-//        String message = "Ошибка";
-//
-//        BadParameterException exc = new BadParameterException(message);
-//
-//        ErrorResponse errorResponse = errorHandler.handleBadParameterExc(exc);
-//
-//        assertEquals(message, errorResponse.getError());
-//    }
-
     @Test
     void handleNotFoundExc() {
         String message = "Такого элемента не зарегистрировано";

@@ -9,8 +9,6 @@ import ru.practicum.shareit.service.Create;
 import ru.practicum.shareit.service.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")

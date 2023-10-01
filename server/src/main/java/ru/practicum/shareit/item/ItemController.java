@@ -55,12 +55,9 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text,
-                                @RequestParam(defaultValue = "0") int from,
-                                @RequestParam(defaultValue = "20") int size) {
-        log.info("В метод search передан text: '{}', индекс первого элемента {}, количество элементов на " +
-                "странице {}", text, from, size);
-        return itemService.search(text, from, size);
+    public List<ItemDto> search(@RequestParam String text) {
+        log.info("В метод search передан text: '{}'", text);
+        return itemService.search(text);
     }
 
     @PostMapping("/{itemId}/comment")
