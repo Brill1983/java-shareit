@@ -9,10 +9,12 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.service.StartBeforeEnd;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @StartBeforeEnd

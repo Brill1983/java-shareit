@@ -22,6 +22,7 @@ import static ru.practicum.shareit.service.Constants.HEADER;
 @Slf4j
 @Validated
 public class BookingController {
+
     private final BookingClient bookingClient;
 
     @PostMapping
